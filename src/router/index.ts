@@ -14,17 +14,7 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
-  {
-    path: '/about',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'About',
-        component: () => import("@/views/About.vue")
-      }
-    ]
-  },
+
   {
     path: '/login',
     name: 'Login',
@@ -38,6 +28,39 @@ const routes: Array<RouteRecordRaw> = [
         path: '',
         name: 'Homework',
         component: () => import('@/views/Homework.vue')
+      }
+    ]
+  },
+  {
+    path: '/apply',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Apply',
+        component: () => import('@/views/ApplyHomework.vue')
+      }
+    ]
+  },
+  {
+    path: '/develp',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Develp',
+        component: () => import('@/views/DevelopHomework.vue')
+      }
+    ]
+  },
+  {
+    path: '/certificate',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'certificate',
+        component: () => import('@/views/Certificate.vue')
       }
     ]
   }
