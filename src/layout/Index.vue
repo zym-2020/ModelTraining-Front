@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container>
       <el-header><my-header/></el-header>
-      <el-main><router-view /></el-main>
+      <el-main><router-view/></el-main>
       <el-footer><foot /></el-footer>
     </el-container>
   </div>
