@@ -27,9 +27,9 @@
           </div>
           <team v-if="active == 'team'" />
           <apply-home v-if="active == 'commit'" />
-          <description v-if="active == 'description'" />
-          <method v-if="active === 'method'" />
-          <result v-if="active === 'result'" />
+          <description v-if="active == 'description'" :descriptionValue="descriptionValue"/>
+          <method v-if="active === 'method'" :methodValue="methodValue"/>
+          <result v-if="active === 'result'" :resultValue="resultValue"/>
         </div>
       </el-col>
     </el-row>
@@ -37,16 +37,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import Team from "@/components/Team.vue";
 import ApplyHome from "@/components/ApplyHome.vue";
 import Description from "@/components/Description.vue";
 import Method from "@/components/Method.vue";
 import Result from "@/components/Result.vue";
+import router from '@/router'
 export default defineComponent({
   components: { Team, ApplyHome, Description, Method, Result },
   setup() {
     const active = ref("commit");
+    const descriptionValue = ref<any>()
+    const methodValue = ref<any>()
+    const resultValue = ref<any>()
+
     const selectHandle = (index: string) => {
       console.log(index);
       if (index === "3") {
@@ -62,9 +67,19 @@ export default defineComponent({
       }
     };
 
+    onMounted(() => {
+      console.log(router.currentRoute.value.params.apply)
+      descriptionValue.value = (router.currentRoute.value.params.apply as any).description
+      methodValue.value = (router.currentRoute.value.params.apply as any).method
+      resultValue.value = (router.currentRoute.value.params.apply as any).result
+    })
+
     return {
       active,
       selectHandle,
+      descriptionValue,
+      methodValue,
+      resultValue
     };
   },
 });

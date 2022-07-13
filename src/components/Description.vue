@@ -17,7 +17,10 @@
             resize="none"
           />
         </div>
-        <picture-upload></picture-upload>
+        <picture-upload
+          :pictureList="backgroundPictureList"
+          @returnPictureList="returnBackgroundPictures"
+        ></picture-upload>
       </div>
     </div>
     <div class="purpose">
@@ -35,7 +38,10 @@
             resize="none"
           />
         </div>
-        <picture-upload></picture-upload>
+        <picture-upload
+          :pictureList="purposePictureList"
+          @returnPictureList="returnPurposePictures"
+        ></picture-upload>
       </div>
     </div>
     <div class="scheme">
@@ -96,44 +102,126 @@
             </el-form-item>
             <el-form-item label="研究方法">
               <el-input
-                v-model="schemeForm.methon"
+                v-model="schemeForm.method"
                 type="textarea"
                 resize="none"
                 :rows="3"
               />
             </el-form-item>
           </el-form>
-          <picture-upload></picture-upload>
+          <picture-upload
+            :pictureList="schemePictureList"
+            @returnPictureList="returnSchemePictures"
+          ></picture-upload>
         </div>
       </div>
     </div>
     <div style="text-align: center; margin: 40px 0">
-      <el-button type="primary" plain>保存</el-button>
+      <el-button type="primary" plain @click="save">保存</el-button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { defineComponent, onMounted, reactive, ref } from "vue";
 import PictureUpload from "./PictureUpload.vue";
+import { saveDescription } from "@/api/request";
+import router from "@/router";
+import { notice } from "@/utils/notice";
 export default defineComponent({
+  props: {
+    descriptionValue: {
+      type: Object,
+    },
+  },
   components: { PictureUpload },
-  setup() {
-    const backgroundValue = ref("");
-    const purposeValue = ref("");
-    const schemeValue = ref("");
+  setup(props) {
+    const backgroundValue = ref(
+      (props.descriptionValue as any).background.text
+    );
+    const purposeValue = ref((props.descriptionValue as any).purpose.text);
     const schemeForm = reactive({
-      target: "",
-      location: "",
-      time: "",
-      person: "",
-      methon: "",
+      target: (props.descriptionValue as any).scheme.target,
+      location: (props.descriptionValue as any).scheme.location,
+      time: (props.descriptionValue as any).scheme.time,
+      person: (props.descriptionValue as any).scheme.person,
+      method: (props.descriptionValue as any).scheme.method,
     });
+
+    const backgroundPictureList = ref(
+      (props.descriptionValue as any).background.pictures
+    );
+    const purposePictureList = ref(
+      (props.descriptionValue as any).purpose.pictures
+    );
+    const schemePictureList = ref(
+      (props.descriptionValue as any).scheme.pictures
+    );
+
+    const returnBackgroundPictures = (val: any[]) => {
+      backgroundPictureList.value = [];
+      val.forEach((item) => {
+        backgroundPictureList.value.push(item.name);
+      });
+      console.log(backgroundPictureList.value);
+    };
+
+    const returnPurposePictures = (val: any[]) => {
+      purposePictureList.value = [];
+      val.forEach((item) => {
+        purposePictureList.value.push(item.name);
+      });
+    };
+
+    const returnSchemePictures = (val: any[]) => {
+      schemePictureList.value = [];
+      val.forEach((item) => {
+        schemePictureList.value.push(item.name);
+      });
+    };
+
+    const save = async () => {
+      const background = {
+        text: backgroundValue.value,
+        pictures: backgroundPictureList.value,
+        videos: []
+      }
+      const purpose = {
+        text: purposeValue.value,
+        pictures: purposePictureList.value,
+        videos: []
+      }
+      const scheme = {
+        target: schemeForm.target,
+        location: schemeForm.location,
+        time: schemeForm.time,
+        person: schemeForm.person,
+        method: schemeForm.method,
+        pictures: schemePictureList.value,
+        videos: []
+      }
+      const description = {
+        background,
+        purpose,
+        scheme
+      }
+      const data = await saveDescription((router.currentRoute.value.params.apply as any).id, description)
+      if(data != null && (data as any).code === 0) {
+        notice("success", "成功", "保存成功")
+      }
+    }
+
     return {
       backgroundValue,
       purposeValue,
-      schemeValue,
       schemeForm,
+      backgroundPictureList,
+      purposePictureList,
+      schemePictureList,
+      returnBackgroundPictures,
+      returnPurposePictures,
+      returnSchemePictures,
+      save
     };
   },
 });
@@ -177,11 +265,12 @@ export default defineComponent({
       .right {
         padding: 0 10px;
         flex: 1;
-        
       }
     }
   }
-  .background, .purpose, .scheme {
+  .background,
+  .purpose,
+  .scheme {
     margin-bottom: 40px;
   }
 }

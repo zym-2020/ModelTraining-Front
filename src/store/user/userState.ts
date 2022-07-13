@@ -1,9 +1,9 @@
 export interface UserState {
-    account: string
+    teamId: string
     name: string
 }
 
 export const state: UserState = {
     name: '',
-    account: ''
+    teamId: ''
 }

@@ -6,10 +6,10 @@
     style="max-width: 460px"
   >
     <el-form-item label="账号">
-      <el-input v-model="formLabelAlign.account" />
+      <el-input v-model="formLabelAlign.teamId" />
     </el-form-item>
     <el-form-item label="密码">
-      <el-input v-model="formLabelAlign.password" />
+      <el-input v-model="formLabelAlign.name" />
     </el-form-item>
   </el-form>
   <el-button @click="loginClick">登录</el-button>
@@ -17,21 +17,20 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
-import { login } from "@/api/request";
 // import { useStore } from "@/store";
 import { store } from '@/store'
 export default defineComponent({
   setup() {
     // const store = useStore();
     const formLabelAlign = reactive({
-      account: "",
-      password: "",
+      teamId: "",
+      name: "",
     });
 
     const loginClick = async () => {
       await store.dispatch("login", {
-        account: formLabelAlign.account,
-        password: formLabelAlign.password,
+        teamId: formLabelAlign.teamId,
+        name: formLabelAlign.name,
       });
     };
 

@@ -12,7 +12,7 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<UserState, RootState>, 'commit'>
 
 export interface Actions {
-    ['login']({ commit }: AugmentedActionContext, userInfo: { account: string, password: string }): Promise<void>
+    ['login']({ commit }: AugmentedActionContext, userInfo: { teamId: string, name: string }): Promise<void>
     logout({ commit }: AugmentedActionContext): void
 }
 
@@ -27,7 +27,7 @@ export const userActions: ActionTree<UserState, RootState> & Actions = {
             } else if (data.code === 0) {
                 setToken(data.data.token)
                 notice('success', '成功', '登录成功')
-                commit("SET_ACCOUNT", data.data.info.account)
+                commit("SET_TEAM_ID", data.data.info.teamId)
                 commit("SET_NAME", data.data.info.name)
                 router.push({ path: '/' })
             } else {
@@ -39,7 +39,7 @@ export const userActions: ActionTree<UserState, RootState> & Actions = {
     logout({ commit }) {
         localStorage.clear()
         commit("SET_NAME", "")
-        commit("SET_ACCOUNT", '')
+        commit("SET_TEAM_ID", '')
         router.push({ path: '/login' })
     },
 

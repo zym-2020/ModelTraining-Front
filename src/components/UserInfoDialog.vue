@@ -31,7 +31,7 @@ export default defineComponent({
       return store.state.user.name;
     });
     const account = computed(() => {
-      return store.state.user.account;
+      return store.state.user.teamId;
     });
 
     const layoutClick = () => {
