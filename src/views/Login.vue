@@ -43,7 +43,7 @@ export default defineComponent({
   components:{Foot}
 });
 </script>
-<style>
+<style scoped>
   .el-footer {
     height: 200px;
   }

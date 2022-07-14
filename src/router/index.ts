@@ -44,14 +44,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'Apply',
-        component: () => import('@/views/ApplyHomework.vue'),
-        children:[
-          {
-            path:'',
-            name: 'WangEditor2',
-            component: () => import('@/layout/components/wangEditor.vue')
-          }
-        ]
+        component: () => import('@/views/ApplyHomework.vue')
       }
     ]
   },
