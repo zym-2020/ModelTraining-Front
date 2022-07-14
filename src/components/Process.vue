@@ -18,7 +18,7 @@
     <el-timeline>
       <el-timeline-item timestamp="2018/4/2" placement="top">
         <div class="add">
-          <el-icon size="20px"><Plus /></el-icon>
+          <el-icon size="20px" ><Plus /></el-icon>
         </div>
       </el-timeline-item>
     </el-timeline>
