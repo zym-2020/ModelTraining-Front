@@ -1,11 +1,11 @@
 <template>
   <div class="main">
     <el-row>
-      <el-col :span="12" v-for="(item, index) in data" :key="index"
-        ><div :class="'module item' + index" @click="toNav(item.path)">
-          {{ item.title }}
-        </div></el-col
-      >
+      <el-col :span="12" v-for="(item, index) in data" :key="index">
+        <div :class="'module item' + index"  @click="toNav(item.path)">
+          <p class="itemTitle">{{ item.title }}</p>
+        </div>
+      </el-col>
     </el-row>
   </div>
 </template>
@@ -68,6 +68,15 @@ export default defineComponent({
     opacity: 1;
   }
 }
+.itemTitle{
+   margin-left: 150px;
+   margin-top: 90px;
+   font-size:30px;
+   font-weight:900;
+   color: #ffffff;
+   text-shadow: 5px 5px 5px #000000;
+   position: relative;
+}
 .main {
   height: calc(100vh - 260px);
   .el-row {
@@ -77,15 +86,18 @@ export default defineComponent({
       .module {
         height: 65%;
         width: 65%;
-        background: red;
         border-radius: 6px;
         position: absolute;
         animation: scale-in-center 0.5s linear;
         transition: all 0.5s;
         cursor: pointer;
       }
-
       .item0 {
+        background: rgb(145, 135, 225); 
+        background-image:url("../../public/img/icons/work.png");
+        background-size:40% 60%;
+        background-repeat:no-repeat ;
+        background-position: right bottom;
         right: 15px;
         bottom: 15px;
         &:hover {
@@ -95,6 +107,11 @@ export default defineComponent({
         }
       }
       .item1 {
+        background: rgb(214, 135, 225);
+        background-image:url("../../public/img/icons/apply.png");
+        background-size:40% 60%;
+        background-repeat:no-repeat ;
+        background-position: right bottom;
         left: 15px;
         bottom: 15px;
         &:hover {
@@ -104,6 +121,11 @@ export default defineComponent({
         }
       }
       .item2 {
+        background: rgb(225, 135, 135);
+        background-image:url("../../public/img/icons/develop.png");
+        background-size:40% 60%;
+        background-repeat:no-repeat ;
+        background-position: right bottom;
         right: 15px;
         top: 15px;
         &:hover {
@@ -113,6 +135,11 @@ export default defineComponent({
         }
       }
       .item3 {
+        background: rgb(225, 171, 135);
+        background-image:url("../../public/img/icons/certificate.png");
+        background-size:30% 60%;
+        background-repeat:no-repeat ;
+        background-position: right bottom;
         left: 15px;
         top: 15px;
         &:hover {

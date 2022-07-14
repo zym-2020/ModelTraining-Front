@@ -56,7 +56,7 @@ export default defineComponent({
   .menu {
     display: flex;
     left: 400px;
-    position: absolute;
+    position: relative;
     .menu-item {
       padding: 0 20px;
       cursor: pointer;
