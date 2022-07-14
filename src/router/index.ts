@@ -14,7 +14,6 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
-
   {
     path: '/login',
     name: 'Login',
@@ -27,7 +26,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'Homework',
-        component: () => import('@/views/Homework.vue')
+        component: () => import('@/views/Homework.vue'),
+        children:[
+          {
+            path:'',
+            name: 'WangEditor1',
+            component: () => import('@/layout/components/wangEditor.vue')
+          }
+        ]
       }
     ]
   },
@@ -38,7 +44,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'Apply',
-        component: () => import('@/views/ApplyHomework.vue')
+        component: () => import('@/views/ApplyHomework.vue'),
+        children:[
+          {
+            path:'',
+            name: 'WangEditor2',
+            component: () => import('@/layout/components/wangEditor.vue')
+          }
+        ]
       }
     ]
   },
@@ -49,7 +62,14 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'Develp',
-        component: () => import('@/views/DevelopHomework.vue')
+        component: () => import('@/views/DevelopHomework.vue'),
+        children:[
+          {
+            path:'',
+            name: 'WangEditor3',
+            component: () => import('@/layout/components/wangEditor.vue')
+          }
+        ]
       }
     ]
   },
