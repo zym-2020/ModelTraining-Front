@@ -21,13 +21,41 @@
         </div>
         <div class="right">
           <div class="model-base-info">
-            <model-base-info v-if="active === '1-1'"></model-base-info>
-            <model-meta-data v-if="active === '1-2'"></model-meta-data>
-            <model-source v-if="active === '1-3'"></model-source>
-            <data-base-info v-if="active === '2-1'"></data-base-info>
-            <data-active v-if="active === '2-2'"></data-active>
-            <data-source v-if="active === '2-3'"></data-source>
-            <compute-resource v-if="active === '3'"></compute-resource>
+            <model-base-info
+              :modelBaseInfoValue="modelBaseInfoValue"
+              @returnModelBaseInfo="returnModelBaseInfo"
+              v-if="active === '1-1'"
+            ></model-base-info>
+            <model-meta-data
+              :modelMetaDataValue="modelMetaDataValue"
+              @returnModelMetaData="returnModelMetaData"
+              v-if="active === '1-2'"
+            ></model-meta-data>
+            <model-source
+              :modelSourceValue="modelSourceValue"
+              @returnModelSource="returnModelSource"
+              v-if="active === '1-3'"
+            ></model-source>
+            <data-base-info
+              :dataBaseInfoValue="dataBaseInfoValue"
+              @returnDataBase="returnDataBase"
+              v-if="active === '2-1'"
+            ></data-base-info>
+            <data-active
+              v-if="active === '2-2'"
+              :dataActiveValue="dataActiveValue"
+              @returnDataActive="returnDataActive"
+            ></data-active>
+            <data-source
+              :dataSourceValue="dataSourceValue"
+              @returnDataSource="returnDataSource"
+              v-if="active === '2-3'"
+            ></data-source>
+            <compute-resource
+              :computeResourceValue="computeResourceValue"
+              @returnComputResource="returnComputResource"
+              v-if="active === '3'"
+            ></compute-resource>
           </div>
         </div>
       </div>
@@ -38,11 +66,14 @@
         <h4>实验过程</h4>
       </div>
       <div>
-        <process />
+        <process
+          @returnProcessList="returnProcessList"
+          :initProcessList="initProcessList"
+        />
       </div>
     </div>
     <div class="btn">
-      <el-button type="primary" plain>保存</el-button>
+      <el-button type="primary" plain @click="saveClick">保存</el-button>
     </div>
   </div>
 </template>
@@ -53,7 +84,14 @@ interface Tree {
   label: string;
   children?: Tree[];
 }
-import { defineComponent, ref, nextTick } from "vue";
+import {
+  defineComponent,
+  ref,
+  nextTick,
+  computed,
+  reactive,
+  onMounted,
+} from "vue";
 import ModelBaseInfo from "./ModelBaseInfo.vue";
 import ModelMetaData from "./ModelMetaData.vue";
 import ModelSource from "./ModelSource.vue";
@@ -62,6 +100,9 @@ import DataActive from "./DataActive.vue";
 import DataSource from "./DataSource.vue";
 import ComputeResource from "./ComputeResource.vue";
 import Process from "./Process.vue";
+import router from "@/router";
+import { savaMethod } from "@/api/request";
+import { notice } from "@/utils/notice";
 export default defineComponent({
   components: {
     ModelBaseInfo,
@@ -73,7 +114,36 @@ export default defineComponent({
     ComputeResource,
     Process,
   },
-  setup() {
+  props: {
+    methodValue: {
+      type: Object,
+    },
+  },
+  setup(props) {
+    const processes = ref<any[]>((props.methodValue as any).processes);
+
+    const modelBaseInfoValue = ref(
+      (props.methodValue as any).resource.modelResource.modelBaseInfo
+    );
+    const modelMetaDataValue = ref(
+      (props.methodValue as any).resource.modelResource.modelMetaData
+    );
+    const modelSourceValue = ref(
+      (props.methodValue as any).resource.modelResource.modelSource
+    );
+    const dataBaseInfoValue = ref(
+      (props.methodValue as any).resource.dataResource.dataBaseInfo
+    );
+    const dataActiveValue = ref(
+      (props.methodValue as any).resource.dataResource.dataActive
+    );
+    const dataSourceValue = ref(
+      (props.methodValue as any).resource.dataResource.dataSource
+    );
+    const computeResourceValue = ref(
+      (props.methodValue as any).resource.computeResource
+    );
+
     const active = ref("1-1");
     const tree = ref();
     const defaultProps = {
@@ -111,6 +181,10 @@ export default defineComponent({
       { id: "3", label: "计算资源" },
     ];
 
+    const initProcessList = computed(() => {
+      return (router.currentRoute.value.params.apply as any).method.processes;
+    });
+
     nextTick(() => {
       tree.value.setCurrentKey("1-1");
     });
@@ -121,12 +195,87 @@ export default defineComponent({
       }
     };
 
+    const returnProcessList = (val: any[]) => {
+      processes.value = val;
+    };
+
+    const returnModelBaseInfo = (val: any) => {
+      modelBaseInfoValue.value = val;
+    };
+
+    const returnDataActive = (val: any) => {
+      dataActiveValue.value = val;
+    };
+
+    const returnModelMetaData = (val: any) => {
+      modelMetaDataValue.value = val;
+    };
+
+    const returnModelSource = (val: any) => {
+      modelSourceValue.value = val;
+    };
+
+    const returnDataBase = (val: any) => {
+      dataBaseInfoValue.value = val;
+    };
+
+    const returnDataSource = (val: any) => {
+      dataSourceValue.value = val;
+    };
+
+    const returnComputResource = (val: any) => {
+      computeResourceValue.value = val;
+    };
+
+    const saveClick = async () => {
+      const method = {
+        processes: processes.value,
+        resource: {
+          computeResource: computeResourceValue.value,
+          dataResource: {
+            dataBaseInfo: dataBaseInfoValue.value,
+            dataActive: dataActiveValue.value,
+            dataSource: dataSourceValue.value,
+          },
+          modelResource: {
+            modelBaseInfo: modelBaseInfoValue.value,
+            modelMetaData: modelMetaDataValue.value,
+            modelSource: modelSourceValue.value,
+          },
+        },
+      };
+      const data = await savaMethod(
+        (router.currentRoute.value.params.apply as any).id,
+        method
+      );
+      if (data != null && (data as any).code === 0) {
+        notice("success", "成功", "保存成功！");
+      }
+    };
+
     return {
       active,
       defaultProps,
       data,
       nodeClick,
       tree,
+      returnProcessList,
+      initProcessList,
+      dataActiveValue,
+      returnDataActive,
+      modelBaseInfoValue,
+      returnModelBaseInfo,
+      modelMetaDataValue,
+      returnModelMetaData,
+      modelSourceValue,
+      returnModelSource,
+      dataBaseInfoValue,
+      returnDataBase,
+      dataSourceValue,
+      returnDataSource,
+      computeResourceValue,
+      returnComputResource,
+      saveClick,
     };
   },
 });

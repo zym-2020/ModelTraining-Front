@@ -3,41 +3,44 @@
     <div class="form-item-left">
       <el-form label-position="right" label-width="100px" :model="dataBaseInfo">
         <el-form-item label="名称">
-          <el-input v-model="dataBaseInfo.name" />
+          <el-input v-model="dataBaseInfo.name" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="描述">
-          <el-input v-model="dataBaseInfo.description" />
+          <el-input v-model="dataBaseInfo.description" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="位置">
-          <el-input v-model="dataBaseInfo.location" />
+          <el-input v-model="dataBaseInfo.location" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="格式">
-          <el-input v-model="dataBaseInfo.format" />
+          <el-input v-model="dataBaseInfo.format" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="版本">
-          <el-input v-model="dataBaseInfo.version" />
+          <el-input v-model="dataBaseInfo.version" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="数据生产时间">
-          <el-input v-model="dataBaseInfo.produceTime" />
+          <el-input v-model="dataBaseInfo.produceTime" @change="changeHandle" />
         </el-form-item>
       </el-form>
     </div>
     <div class="form-item-right">
       <el-form label-position="right" label-width="100px" :model="dataBaseInfo">
         <el-form-item label="数据更新时间">
-          <el-input v-model="dataBaseInfo.updateTime" />
+          <el-input v-model="dataBaseInfo.updateTime" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="单位">
-          <el-input v-model="dataBaseInfo.unit" />
+          <el-input v-model="dataBaseInfo.unit" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="小数位">
-          <el-input v-model="dataBaseInfo.precision" />
+          <el-input v-model="dataBaseInfo.precision" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="时空尺度">
-          <el-input v-model="dataBaseInfo.spaceTimeScale" />
+          <el-input
+            v-model="dataBaseInfo.spaceTimeScale"
+            @change="changeHandle"
+          />
         </el-form-item>
         <el-form-item label="唯一标识符">
-          <el-input v-model="dataBaseInfo.identifier" />
+          <el-input v-model="dataBaseInfo.identifier" @change="changeHandle" />
         </el-form-item>
       </el-form>
     </div>
@@ -47,23 +50,34 @@
 <script lang="ts">
 import { defineComponent, reactive } from "vue";
 export default defineComponent({
-  setup() {
+  props: {
+    dataBaseInfoValue: {
+      type: Object,
+    },
+  },
+  emits: ["returnDataBase"],
+  setup(props, context) {
     const dataBaseInfo = reactive({
-      name: "",
-      description: "",
-      location: "",
-      format: "",
-      version: "",
-      produceTime: "",
-      updateTime: "",
-      unit: "",
-      precision: "",
-      spaceTimeScale: "",
-      identifier: "",
+      name: (props.dataBaseInfoValue as any).name,
+      description: (props.dataBaseInfoValue as any).description,
+      location: (props.dataBaseInfoValue as any).location,
+      format: (props.dataBaseInfoValue as any).format,
+      version: (props.dataBaseInfoValue as any).version,
+      produceTime: (props.dataBaseInfoValue as any).produceTime,
+      updateTime: (props.dataBaseInfoValue as any).updateTime,
+      unit: (props.dataBaseInfoValue as any).unit,
+      precision: (props.dataBaseInfoValue as any).precision,
+      spaceTimeScale: (props.dataBaseInfoValue as any).spaceTimeScale,
+      identifier: (props.dataBaseInfoValue as any).identifier,
     });
+
+    const changeHandle = () => {
+      context.emit("returnDataBase", dataBaseInfo);
+    };
 
     return {
       dataBaseInfo,
+      changeHandle,
     };
   },
 });

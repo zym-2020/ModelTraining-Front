@@ -21,7 +21,6 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { notice } from "@/utils/notice";
 export default defineComponent({
