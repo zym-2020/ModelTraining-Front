@@ -1,18 +1,18 @@
 <template>
-  <el-form
-    label-position="right"
-    label-width="100px"
-    :model="formLabelAlign"
-    style="max-width: 460px"
-  >
-    <el-form-item label="账号">
-      <el-input v-model="formLabelAlign.teamId" />
-    </el-form-item>
-    <el-form-item label="密码">
-      <el-input v-model="formLabelAlign.name" />
-    </el-form-item>
+<div class="login-wrap">
+  <el-form :model="formLabelAlign" class="inform">
+    <h3>模型培训提交系统</h3>
+    <el-divider/>
+      <el-form-item label="账号">
+        <el-input v-model="formLabelAlign.teamId" placeholder="请输入账号"/>
+      </el-form-item>
+      <el-form-item label="密码">
+        <el-input v-model="formLabelAlign.name" placeholder="请输入密码"/>
+      </el-form-item>
   </el-form>
-  <el-button @click="loginClick">登录</el-button>
+  <el-button type="primary" @click="loginClick">登录</el-button>
+</div>
+  <el-footer><foot /></el-footer>
 </template>
 
 <script lang="ts">
@@ -43,22 +43,30 @@ export default defineComponent({
   components:{Foot}
 });
 </script>
-<style scoped>
+<style lang="scss" scoped>
   .el-footer {
-    height: 200px;
+    margin-bottom: 150px;
   }
   h3 {
+    display: flex;
+    justify-content: center;
     color: rgb(0, 140, 255);
     font-size: 24px;
-    margin-left:95px;
   }
   .el-divider{
-    border-color:rgb(0, 140, 255)
+    border-color:rgb(0, 140, 255);
+    width: 300px;
+    margin-left: 50px;
   }
   .el-button {
-    width: 80%;
-    margin-left:40px;
+    width: 160px;
+    margin-left: 120px;
   }
+  .el-form-item{
+    width: 240px;
+    margin-left: 80px;
+  }
+
 
   .login-wrap {
     background-image:url("../../public/img/icons/loginbg.png");

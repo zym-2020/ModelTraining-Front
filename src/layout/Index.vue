@@ -31,7 +31,7 @@ export default defineComponent({
     min-height: calc(100vh - 260px);
   }
   .el-footer {
-    height: 200px;
+    height: 180px;
   }
 }
 </style>

@@ -28,7 +28,7 @@ export default defineComponent({
   border-top: solid 1px #eeeeee;
   box-sizing: border-box;
   .image {
-    margin-top: 30px;
+    margin-top: 20px;
     margin-bottom: 15px;
     img {
       margin: 0 20px;
