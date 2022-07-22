@@ -1,6 +1,5 @@
 <template>
   <div>
-    <button @click="test">按钮</button>
     <div style="border: solid 1px">
       <Toolbar
         style="border-bottom: 1px solid #ccc"
@@ -38,17 +37,13 @@ export default defineComponent({
       editorRef.value = editor; // 记录 editor 实例，重要！
     };
 
-    const test = () => {
-      console.log(valueHtml.value);
-    };
-
     return {
       editorRef,
       toolbarConfig,
       editorConfig,
       valueHtml,
       handleCreated,
-      test,
+
     };
   },
 });

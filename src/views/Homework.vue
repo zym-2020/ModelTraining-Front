@@ -1,88 +1,77 @@
 <template>
-  <div class="common-layout">
-    <el-container>
-      <el-aside width="200px">
-        <div class="mb-2">
-            <el-icon><Reading /></el-icon>
-            <h5>模型作业</h5>
+  <div class="Outline">
+    <el-scrollbar max-height="500px">
+    <div class="collapseForm">
+    <el-collapse v-model="activeNames">
+      <el-collapse-item class="collapseItem" title="GeoDetector模型" name="1">
+        <div>
+          <Upload />
         </div>
-        <el-menu
-            default-active="1-1"
-            class="el-menu-vertical-demo"
-        >
-            <el-sub-menu index="1">
-            <template #title>
-                <el-icon><Search /></el-icon>
-                <span>实验描述</span>
-            </template>
-                <el-menu-item @click="changeId($event)" index="1-1">1.1研究背景</el-menu-item>
-                <el-menu-item @click="changeId($event)" index="1-2">1.2研究目的</el-menu-item>
-                <el-menu-item @click="changeId($event)" index="1-3">1.3研究方案/实验设计</el-menu-item>
-            </el-sub-menu>
-            <el-sub-menu index="2">
-            <template #title>
-                <el-icon><Filter /></el-icon>
-                <span>实验方法</span>
-            </template>
-                <el-menu-item @click="changeId($event)" index="2-1">2.1研究资源</el-menu-item>
-                <el-menu-item @click="changeId($event)" index="2-2">2.2实验过程</el-menu-item>
-            </el-sub-menu>
-            <el-sub-menu index="3">
-            <template #title>
-            <el-icon><Finished /></el-icon>
-                <span>实验结果</span>
-            </template>
-                <el-menu-item @click="changeId($event)" index="3-1">3.1结果输出</el-menu-item>
-                <el-menu-item @click="changeId($event)" index="3-2">3.2结果验证</el-menu-item>
-                <el-menu-item @click="changeId($event)" index="3-3">3.3其他</el-menu-item>
-            </el-sub-menu>
-        </el-menu>
-      </el-aside>
-            <el-main>
-                <router-view v-slot="{ Component }">
-                    <keep-alive>
-                        <component class="view" :is="Component" :key="route.fullPath"/>
-                    </keep-alive>
-                </router-view>
-            </el-main>
-    </el-container>
+      </el-collapse-item>
+      <el-collapse-item title="GeoSOS模型" name="2">
+        <div>
+          <Upload />
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="HASM模型" name="3">
+        <div>
+          <Upload />
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="GWmodelS模型" name="4">
+        <div>
+          <Upload />
+        </div>
+      </el-collapse-item>
+    </el-collapse>
+    </div>
+    </el-scrollbar>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue'
-import { useRouter,useRoute } from 'vue-router'
+import { defineComponent, ref } from 'vue'
+import Upload from "@/components/homeworkUpload.vue"
 export default defineComponent({
+    components:{Upload},
     setup() {
-        const router = useRouter()
-        const route = useRoute()
-        const changeId = (e:any) => {
-            router.push({
-            name: 'WangEditor1',
-            query: {eId:e.index}
-        })
-        }
-         onMounted(() => {
-            router.push({
-            name: 'WangEditor1',
-            query: {eId:'1-1'}
-        })
-        })
-        return{
-            changeId,
-            route
-        }
+        const activeNames = ref(['1'])
+        return {
+            activeNames
+    }
     },
 })
 </script>
 
 <style lang="scss" scoped>
-    .mb-2{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        color: rgb(125, 125, 125);
 
-    }
+.collapseForm{
+    width: 700px;
+    height: 400px;
+    margin: 40px auto;
+}
+
+/deep/ .el-collapse-item__header {
+    padding: 0px 5px;
+    font-size: 13px;
+    font-weight: 800;
+    
+}
+
+  .Outline {
+    background-size:80% 150%;
+    background-repeat:no-repeat ;
+    background-position: right;
+/*     background-color: rgb(245, 245, 255); */
+    width: 800px;
+    height: 500px;
+    margin: 60px auto;
+    overflow: hidden;
+    padding-top: 10px;
+    line-height: 40px;
+/*     border: 2px solid  rgb(0, 140, 255); */
+    border-radius: 30px;
+    box-shadow:var(--el-box-shadow-dark);
+}
+
 </style>

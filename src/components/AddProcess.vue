@@ -1,45 +1,62 @@
 <template>
   <div>
-    <el-form :model="form" label-width="100px">
-      <el-form-item label="步骤名称">
+    <el-form :model="form" label-width="100px" :rules="rules">
+      <el-form-item label="步骤名称" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="步骤类型">
-        <el-select v-model="form.stepType" placeholder="请选择步骤类型">
+      <el-form-item label="步骤类型" prop="stepType" v-if="processType === 'method'">
+        <el-select v-model="form.stepType" placeholder="请选择步骤类型" filterable allow-create>
           <el-option label="数据预处理" value="数据预处理" />
           <el-option label="模拟分析" value="模拟分析" />
           <el-option label="数据后处理" value="数据后处理" />
           <el-option label="敏感性分析" value="敏感性分析" />
           <el-option label="可视化" value="可视化" />
-          <el-option label="其他" value="其他" />
+          <el-option label="其他(请直接输入)" value=" " disabled/>
         </el-select>
       </el-form-item>
-      <el-form-item label="操作类型">
-        <el-select v-model="form.operateType" placeholder="请选择操作类型">
+      <el-form-item label="步骤类型" prop="stepType" v-else>
+        <el-select v-model="form.stepType" placeholder="请选择步骤类型" filterable allow-create >
+          <el-option label="误差评估" value="误差评估" />
+          <el-option label="误差分析" value="误差分析" />
+          <el-option label="不确定性分析" value="不确定性分析" />
+          <el-option label="收敛性分析" value="收敛性分析" />
+          <el-option label="其他(请直接输入)" value=" " disabled />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="操作类型" prop="operateType">
+        <el-select v-model="form.operateType" placeholder="请选择操作类型" filterable allow-create>
           <el-option label="软件操作" value="软件操作" />
           <el-option label="等式计算" value="等式计算" />
           <el-option label="程序运行" value="程序运行" />
-          <el-option label="其他" value="其他" />
+          <el-option label="其他(请直接输入)" value=" " disabled/>
         </el-select>
       </el-form-item>
-      <el-form-item label="添加资源">
+      <h5>从已添加的“研究资源”中选择步骤中涉及的资源：</h5>
+      <el-form-item label="模型资源">
         <el-tag
           type="warning"
-          v-for="(item, index) in form.processResources"
+          v-for="(item, index) in form.modelResources"
           :key="index"
           closable
-          @close="resourceClose(index)"
-          @click="rousourceClick(index)"
-          >{{ item.name }}</el-tag
-        >
-        <el-button type="primary" :icon="Plus" @click="addResource = true" />
+          @close="ModelClose(index)"
+          >{{ item.modelBaseInfo.name }}</el-tag>
+        <el-button type="primary" :icon="Plus" @click="addModel = true" />
       </el-form-item>
-      <el-form-item label="步骤描述">
+        <el-form-item label="数据资源" >
+        <el-tag
+          type="warning"
+          v-for="(item, index) in form.dataResources"
+          :key="index"
+          closable
+          @close="DataClose(index)"
+          >{{ item.dataBaseInfo.name }}</el-tag>
+        <el-button type="primary" :icon="Plus" @click="addData= true" />
+      </el-form-item>
+      <el-form-item label="步骤描述" prop="description">
         <el-input
           v-model="form.description"
           type="textarea"
           :rows="3"
-          resize="none"
         />
       </el-form-item>
       <el-form-item label="添加图片">
@@ -48,9 +65,30 @@
           @returnPictureList="handlePictures"
         ></picture-upload>
       </el-form-item>
-      <el-form-item label="参考文献">
-        <el-input v-model="form.reference" />
-      </el-form-item>
+    <el-form-item label="参考文献">
+        <el-tag
+          v-for="tag in form.references"
+          :key="tag"
+          class="mx-1"
+          closable
+          :disable-transitions="false"
+          @close="handleClose(tag)"
+        >
+          {{tag.length>33?tag.substring(0,22)+'......'+tag.substring(tag.length-10,tag.length):tag}}
+        </el-tag>
+        <el-input
+          v-if="inputVisible"
+          ref="InputRef"
+          v-model="inputValue"
+          class="ml-1 w-20"
+          size="small"
+          @keyup.enter="handleInputConfirm"
+          @blur="handleInputConfirm"
+        />
+        <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput">
+          + 添加参考文献
+        </el-button>
+    </el-form-item>
       <el-form-item label="其他补充">
         <el-input v-model="form.other" />
       </el-form-item>
@@ -68,112 +106,52 @@
       >
     </div>
   </div>
-  <el-dialog v-model="addResource" width="400px" title="添加资源">
-    <el-form :model="resource" label-width="100px">
-      <el-form-item label="资源名称">
-        <el-input v-model="resource.name" />
-      </el-form-item>
-      <el-form-item label="资源类型">
-        <el-select
-          v-model="resource.type"
-          placeholder="请选择资源类型"
-          @change="resourceTypeChange"
+  <el-dialog v-model="addModel" width="400px" title="添加模型资源">
+      <el-table
+          ref="modelmultipleTableRef"
+          :data="Modeltemp"
+          style="width: 100%"
+          @selection-change="modelSelectionChange"
         >
-          <el-option label="数据资源" value="data" />
-          <el-option label="模型资源" value="model" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="模型输入" v-if="resource.type === 'model'">
-        <el-tag
-          type="success"
-          v-for="(item, index) in resource.modelInputs"
-          :key="index"
-          closable
-          @close="inputClose(index)"
-          @click="inputClick(index)"
-          >{{ item.name }}</el-tag
-        >
-        <el-button type="success" :icon="Plus" @click="addInput = true" />
-      </el-form-item>
-      <el-form-item label="模型输出" v-if="resource.type === 'model'">
-        <el-tag
-          type="danger"
-          v-for="(item, index) in resource.modelOutputs"
-          :key="index"
-          closable
-          @close="outputClose(index)"
-          @click="outputClick(index)"
-          >{{ item.name }}</el-tag
-        >
-        <el-button type="success" :icon="Plus" @click="addOutput = true" />
-      </el-form-item>
-      <el-form-item label="数据描述" v-if="resource.type === 'data'">
-        <el-input v-model="resource.dataInfo" />
-      </el-form-item>
-      <el-form-item label="模型描述" v-if="resource.type === 'model'">
-        <el-input v-model="resource.modelInfo" />
-      </el-form-item>
-    </el-form>
+          <el-table-column type="selection" width="55" />
+          <el-table-column align='center' prop="modelBaseInfo.name" label="模型资源名称" show-overflow-tooltip/>
+        </el-table>
+        <div style="margin-top: 20px">
+          <el-button @click="modeltoggleSelection">清空选择</el-button>
+        </div>
     <template #footer>
-      <span class="dialog-footer" v-if="!resourceUpdateFlag">
-        <el-button type="primary" @click="addResourceClick">确定</el-button>
-      </span>
-      <span class="dialog-footer" v-else>
-        <el-button type="success" @click="updateResourceClick">修改</el-button>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="addModelClick">选择</el-button>
       </span>
     </template>
-    <el-dialog v-model="addInput" width="400px" title="模型输入">
-      <el-form :model="inputForm" label-width="100px">
-        <el-form-item label="输入名称">
-          <el-input v-model="inputForm.name" />
-        </el-form-item>
-        <el-form-item label="输入类型">
-          <el-select v-model="inputForm.dataType" placeholder="请选择数据类型">
-            <el-option label="参数" value="parameter" />
-            <el-option label="数据" value="data" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="输入描述">
-          <el-input v-model="inputForm.description" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer" v-if="!inputUpdateFlag">
-          <el-button type="primary" @click="addInputClick">确定</el-button>
-        </span>
-        <span class="dialog-footer" v-else>
-          <el-button type="success" @click="updateInputClick">修改</el-button>
-        </span>
-      </template>
-    </el-dialog>
-    <el-dialog v-model="addOutput" width="400px" title="模型输入">
-      <el-form :model="outputForm" label-width="100px">
-        <el-form-item label="输出名称">
-          <el-input v-model="outputForm.name" />
-        </el-form-item>
-        <el-form-item label="输出格式">
-          <el-input v-model="outputForm.format" />
-        </el-form-item>
-        <el-form-item label="输入描述">
-          <el-input v-model="outputForm.description" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer" v-if="!outputUpdateFlag">
-          <el-button type="primary" @click="addOutputClick">确定</el-button>
-        </span>
-        <span class="dialog-footer" v-else>
-          <el-button type="success" @click="updateOutputClick">修改</el-button>
-        </span>
-      </template>
-    </el-dialog>
+  </el-dialog>
+    <el-dialog v-model="addData" width="400px" title="添加数据资源">
+      <el-table
+          ref="datamultipleTableRef"
+          :data="Datatemp"
+          style="width: 100%"
+          @selection-change="dataSelectionChange"
+        >
+          <el-table-column type="selection" width="55" />
+          <el-table-column align='center' prop="dataBaseInfo.name" label="数据资源名称" show-overflow-tooltip/>
+        </el-table>
+        <div style="margin-top: 20px">
+          <el-button @click="datatoggleSelection">清空选择</el-button>
+        </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="addDataClick">选择</el-button>
+      </span>
+    </template>
   </el-dialog>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive, ref } from "vue";
+import { computed, defineComponent, onMounted, reactive, ref, nextTick } from "vue";
 import PictureUpload from "./PictureUpload.vue";
 import { Plus } from "@element-plus/icons-vue";
+import type {  FormRules, ElTable, ElInput } from 'element-plus'
+
 export default defineComponent({
   components: { PictureUpload },
   props: {
@@ -183,146 +161,114 @@ export default defineComponent({
     operateType: {
       type: String,
     },
+    Modeltemp: {
+      type: Object,
+    },
+    Datatemp: {
+      type: Object,
+    },
+    processType: {
+      type: String,
+    },
   },
   emits: ["returnProcess", "updateProcess"],
   setup(props, context) {
-    const addResource = ref(false);
-    const addInput = ref(false);
-    const addOutput = ref(false);
-    const resourceUpdateFlag = ref(false);
-    const resourceIndex = ref(-1);
-    const inputUpdateFlag = ref(false);
-    const inputIndex = ref(-1);
-    const outputUpdateFlag = ref(false);
-    const outputIndex = ref(-1);
+    const inputValue = ref('')
+    const inputVisible = ref(false)
+    const InputRef = ref<InstanceType<typeof ElInput>>()
+    const addModel= ref(false);
+    const modelSelections  = ref<any[]>()
+    const addData= ref(false);
+    const dataSelections  = ref<any[]>()
     const type = computed(() => {
       return props.operateType;
     });
+    const processType = computed(() => {
+      return props.processType;
+    });
+    const modelSelectionChange = (val: any) =>{
+        modelSelections.value=val
+    }
+    const dataSelectionChange = (val: any) =>{
+        dataSelections.value=val
+    }
+    const modelmultipleTableRef = ref<InstanceType<typeof ElTable>>()
+    const datamultipleTableRef = ref<InstanceType<typeof ElTable>>()
+    const modeltoggleSelection = () => {
+      modelmultipleTableRef.value!.clearSelection()
+    }
+
+    const datatoggleSelection = () => {
+      datamultipleTableRef.value!.clearSelection()
+    }
+
+    const rules = reactive<FormRules>({
+      name: [
+        { required: true, message: '请输入步骤名称', trigger: 'change' }
+      ],
+      stepType: [
+        { required: true, message: '请选择步骤类型', trigger: 'change' }
+      ],
+      operateType: [
+        { required: true, message: '请选择操作类型', trigger: 'change' }
+      ],
+      description: [
+        { required: true, message: '请输入步骤描述', trigger: 'change' }
+      ],
+      })
+
     const pictureList = ref<any[]>((props.processItem as any).pictures);
     const form = reactive({
       name: (props.processItem as any).name,
       stepType: (props.processItem as any).stepType,
       operateType: (props.processItem as any).operateType,
       description: (props.processItem as any).description,
-      reference: (props.processItem as any).reference,
+      references: [] as any[],
       other: (props.processItem as any).other,
       pictures: (props.processItem as any).pictures,
-      processResources: (props.processItem as any).processResources,
+      modelResources:(props.processItem as any).modelResources,
+      dataResources:(props.processItem as any).dataResources
     });
+    const handleClose = (tag: string) => {
+      form.references.splice(form.references.indexOf(tag), 1)
+    }
 
-    const resource = reactive({
-      name: "",
-      type: "",
-      dataInfo: "",
-      modelInfo: "",
-      modelInputs: [] as any[],
-      modelOutputs: [] as any[],
-    });
+    const showInput = () => {
+      inputVisible.value = true
+      nextTick(() => {
+        InputRef.value!.input!.focus()
+      })
+    }
 
-    const inputForm = reactive({
-      name: "",
-      dataType: "",
-      description: "",
-    });
-
-    const outputForm = reactive({
-      name: "",
-      format: "",
-      description: "",
-    });
-
-    const addInputClick = () => {
-      const temp = {
-        name: inputForm.name,
-        dataType: inputForm.dataType,
-        description: inputForm.description,
-      };
-      resource.modelInputs.push(temp);
-      inputForm.name = "";
-      inputForm.dataType = "";
-      inputForm.description = "";
-      addInput.value = false;
+    const handleInputConfirm = () => {
+      if (inputValue.value) {
+        form.references.push(inputValue.value)
+      }
+      inputVisible.value = false
+      inputValue.value = ''
+    }
+    const addModelClick = () => {
+      form.modelResources=modelSelections.value
+      addModel.value = false;
     };
-    const updateInputClick = () => {
-      const temp = {
-        name: inputForm.name,
-        dataType: inputForm.dataType,
-        description: inputForm.description,
-      };
-      resource.modelInputs[inputIndex.value] = temp;
+    const addDataClick = () => {
+      form.dataResources=dataSelections.value
+      addData.value = false;
     };
 
-    const addOutputClick = () => {
-      const temp = {
-        name: outputForm.name,
-        format: outputForm.format,
-        description: outputForm.description,
-      };
-      resource.modelOutputs.push(temp);
-      outputForm.name = "";
-      outputForm.format = "";
-      outputForm.description = "";
-      addOutput.value = false;
+    const ModelClose = (index: number) => {
+      form.modelResources.splice(index, 1);
     };
-    const updateOutputClick = () => {
-      const temp = {
-        name: outputForm.name,
-        format: outputForm.format,
-        description: outputForm.description,
-      };
-      resource.modelOutputs[outputIndex.value] = temp;
+    const DataClose = (index: number) => {
+      form.dataResources.splice(index, 1);
     };
 
-    const inputClose = (index: number) => {
-      resource.modelInputs.splice(index, 1);
-    };
-    const inputClick = (index: number) => {
-      inputForm.name = resource.modelInputs[index].name;
-      inputForm.dataType = resource.modelInputs[index].dataType;
-      inputForm.description = resource.modelInputs[index].description;
-      inputUpdateFlag.value = true;
-      inputIndex.value = index;
-      addInput.value = true;
-    };
-
-    const outputClose = (index: number) => {
-      resource.modelOutputs.splice(index, 1);
-    };
-    const outputClick = (index: number) => {
-      outputForm.name = resource.modelOutputs[index].name;
-      outputForm.format = resource.modelOutputs[index].format;
-      outputForm.description = resource.modelOutputs[index].description;
-      outputUpdateFlag.value = true;
-      outputIndex.value = index;
-      addOutput.value = true;
-    };
-
-    const addResourceClick = () => {
-      form.processResources.push(JSON.parse(JSON.stringify(resource)));
-      addResource.value = false;
-    };
-    const updateResourceClick = () => {
-      form.processResources[resourceIndex.value] = JSON.parse(
-        JSON.stringify(resource)
-      );
-      addResource.value = false;
-    };
-
-    const resourceClose = (index: number) => {
-      form.processResources.splice(index, 1);
-    };
-
-    const rousourceClick = (index: number) => {
-      resource.name = form.processResources[index].name;
-      resource.type = form.processResources[index].type;
-      resource.dataInfo = form.processResources[index].dataInfo;
-      resource.modelInfo = form.processResources[index].modelInfo;
-      resource.modelInputs = form.processResources[index].modelInputs;
-      resource.modelOutputs = form.processResources[index].modelOutputs;
-      addResource.value = true;
-      resourceUpdateFlag.value = true;
+/*     const ModelClick = (index: number) => {
+      modelResources.modelInputs = form.modelResources[index].modelInputs;
+      modelResources.modelOutputs = form.modelResources[index].modelOutputs;
+      addModel.value = true;
       resourceIndex.value = index;
-    };
+    }; */
 
     const addProcessClick = () => {
       context.emit("returnProcess", form);
@@ -337,47 +283,40 @@ export default defineComponent({
         form.pictures.push(item.name);
       });
     };
-
-    const resourceTypeChange = (val: string) => {
-      if (val === "data") {
-        (resource.modelInfo = ""),
-          (resource.modelInputs = []),
-          (resource.modelOutputs = []);
-      } else {
-        resource.dataInfo = "";
-      }
-    };
-
+    onMounted(()=>{
+      if((props.processItem as any).references.length>0)
+        form.references=(props.processItem as any).references
+    })
     return {
       form,
       Plus,
-      resource,
-      addResource,
-      addInput,
-      addOutput,
-      inputForm,
-      outputForm,
-      addInputClick,
-      addOutputClick,
-      inputClose,
-      outputClose,
-      addResourceClick,
-      resourceClose,
-      rousourceClick,
+      modelSelections,
+      addModelClick,
+      ModelClose,
+      dataSelections,
+      addDataClick,
+      DataClose,
       addProcessClick,
       updateProcessClick,
       handlePictures,
       pictureList,
-      resourceUpdateFlag,
-      updateResourceClick,
-      inputClick,
-      inputUpdateFlag,
-      updateInputClick,
-      outputClick,
-      outputUpdateFlag,
-      updateOutputClick,
-      resourceTypeChange,
       type,
+      rules,
+      modeltoggleSelection,
+      modelmultipleTableRef,
+      datatoggleSelection,
+      datamultipleTableRef,
+      addModel,
+      addData,
+      modelSelectionChange,
+      dataSelectionChange,
+      processType,
+      inputValue,
+      inputVisible,
+      InputRef,
+      handleClose,
+      showInput,
+      handleInputConfirm
     };
   },
 });

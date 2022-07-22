@@ -23,10 +23,40 @@ export async function saveDescription(id: string, jsonData: any) {
     return await patch(`/apply/saveDescription/${id}`, jsonData)
 }
 
-export async function savaMethod(id: string, jsonData: any) {
-    return await patch(`/apply/savaMethod/${id}`, jsonData)
+export async function saveProcess (id: string, jsonData: any) {
+    return await patch(`/apply/saveProcess/${id}`, jsonData)
 }
 
 export async function saveResult(id: string, jsonData: any) {
     return await patch(`/apply/saveResult/${id}`, jsonData)
+}
+
+export async function getResource(id: string) {
+    return await get(`/apply/getResource/${id}`)
+}
+
+export async function saveModelResources(id: string, jsonData: any) {
+    return await patch(`/apply/saveModelResources/${id}`, jsonData)
+}
+
+export async function deleteModelResources(id: string, jsonData: any) {
+    return await patch(`/apply/deleteModelResources/${id}`, jsonData)
+}
+
+export async function saveDataResources(id: string, jsonData: any) {
+    return await patch(`/apply/saveDataResources/${id}`, jsonData)
+}
+
+export async function deleteDataResources(id: string, jsonData: any) {
+    return await patch(`/apply/deleteDataResources/${id}`, jsonData)
+}
+
+export async function saveComputeResource(id: string, jsonData: any) {
+    return await patch(`/apply/saveComputeResource/${id}`, jsonData)
+}
+export async function updateModelResources(id: string, jsonData: any) {
+    return await patch(`/apply/updateModelResources/${id}`, jsonData)
+}
+export async function updateDataResources(id: string, jsonData: any) {
+    return await patch(`/apply/updateDataResources/${id}`, jsonData)
 }

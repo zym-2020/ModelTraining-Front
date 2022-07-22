@@ -1,29 +1,29 @@
 <template>
   <div class="data-base-info">
     <div class="form-item-left">
-      <el-form label-position="right" label-width="100px" :model="dataBaseInfo">
-        <el-form-item label="名称">
+      <el-form label-position="right" label-width="100px" :model="dataBaseInfo" :rules="rules">
+        <el-form-item label="名称" prop="name">
           <el-input v-model="dataBaseInfo.name" @change="changeHandle" />
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item label="描述" prop="description">
           <el-input v-model="dataBaseInfo.description" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="位置">
           <el-input v-model="dataBaseInfo.location" @change="changeHandle" />
         </el-form-item>
-        <el-form-item label="格式">
+        <el-form-item label="格式" prop="format">
           <el-input v-model="dataBaseInfo.format" @change="changeHandle" />
         </el-form-item>
         <el-form-item label="版本">
           <el-input v-model="dataBaseInfo.version" @change="changeHandle" />
         </el-form-item>
-        <el-form-item label="数据生产时间">
+        <el-form-item label="数据生产时间" prop="produceTime">
           <el-input v-model="dataBaseInfo.produceTime" @change="changeHandle" />
         </el-form-item>
       </el-form>
     </div>
     <div class="form-item-right">
-      <el-form label-position="right" label-width="100px" :model="dataBaseInfo">
+      <el-form label-position="right" label-width="100px" :model="dataBaseInfo" :rules="rules">
         <el-form-item label="数据更新时间">
           <el-input v-model="dataBaseInfo.updateTime" @change="changeHandle" />
         </el-form-item>
@@ -33,7 +33,7 @@
         <el-form-item label="小数位">
           <el-input v-model="dataBaseInfo.precision" @change="changeHandle" />
         </el-form-item>
-        <el-form-item label="时空尺度">
+        <el-form-item label="时空尺度" prop="spaceTimeScale">
           <el-input
             v-model="dataBaseInfo.spaceTimeScale"
             @change="changeHandle"
@@ -49,6 +49,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive } from "vue";
+import type {  FormRules } from 'element-plus'
 export default defineComponent({
   props: {
     dataBaseInfoValue: {
@@ -74,10 +75,27 @@ export default defineComponent({
     const changeHandle = () => {
       context.emit("returnDataBase", dataBaseInfo);
     };
-
+    const rules = reactive<FormRules>({
+      name: [
+        { required: true, message: '请输入名称', trigger: 'change' }
+      ],
+      description: [
+        { required: true, message: '请输入描述', trigger: 'change' }
+      ],
+      format: [
+        { required: true, message: '请输入格式', trigger: 'change' }
+      ],
+      produceTime: [
+        { required: true, message: '请输入数据生产时间', trigger: 'change' }
+      ],
+      spaceTimeScale: [
+        { required: true, message: '请输入时空尺度', trigger: 'change' }
+      ],
+      })
     return {
       dataBaseInfo,
       changeHandle,
+      rules
     };
   },
 });

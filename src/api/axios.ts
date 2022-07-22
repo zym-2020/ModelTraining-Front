@@ -9,7 +9,7 @@ import { notice } from '@/utils/notice';
 const requestList = new Set()
 
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8081/model/',
+    baseURL: '/model',
     timeout: 200000
 })
 

@@ -1,6 +1,8 @@
 <template>
   <div class="description">
-    <div class="title"><h2>实验描述</h2></div>
+    <div class="title">
+      <h2>实验描述</h2>
+    </div>
     <el-divider />
     <div class="background">
       <div class="small-title">
@@ -8,19 +10,19 @@
         <h4>研究背景</h4>
       </div>
       <div class="body">
-        <div class="input">
-          <el-input
-            v-model="backgroundValue"
-            :rows="3"
-            type="textarea"
-            placeholder="研究背景"
-            resize="none"
-          />
+        <el-form class="input" :model="backgroundForm" :rules="rules">
+          <el-form-item prop="backgroundValue">
+            <el-input v-model="backgroundForm.backgroundValue" :rows="3" type="textarea" placeholder="研究背景"/>
+          </el-form-item>
+        </el-form>
+        <div class="mflex">
+        <picture-upload :pictureList="backgroundPictureList" @returnPictureList="returnBackgroundPictures">
+        </picture-upload>
+        <div class="tips">
+        <h5>说明：需要详细说明该研究/实验的背景</h5>
+        <h5>形式：文本、图片、视频</h5>
         </div>
-        <picture-upload
-          :pictureList="backgroundPictureList"
-          @returnPictureList="returnBackgroundPictures"
-        ></picture-upload>
+        </div>
       </div>
     </div>
     <div class="purpose">
@@ -29,19 +31,18 @@
         <h4>研究目的</h4>
       </div>
       <div class="body">
-        <div class="input">
-          <el-input
-            v-model="purposeValue"
-            :rows="3"
-            type="textarea"
-            placeholder="研究目的"
-            resize="none"
-          />
+        <el-form class="input" :model="purposeForm" :rules="rules">
+          <el-form-item prop="purposeValue">
+            <el-input v-model="purposeForm.purposeValue" :rows="3" type="textarea" placeholder="研究目的" />
+          </el-form-item>
+        </el-form>
+        <div class="mflex">
+        <picture-upload :pictureList="purposePictureList" @returnPictureList="returnPurposePictures"></picture-upload>
+        <div class="tips">
+        <h5>说明：需要详细说明该研究/实验的目的</h5>
+        <h5>形式：文本、图片、视频</h5>
         </div>
-        <picture-upload
-          :pictureList="purposePictureList"
-          @returnPictureList="returnPurposePictures"
-        ></picture-upload>
+        </div>
       </div>
     </div>
     <div class="scheme">
@@ -83,36 +84,30 @@
           </div>
         </div>
         <div class="right">
-          <el-form
-            label-position="right"
-            label-width="80px"
-            :model="schemeForm"
-          >
-            <el-form-item label="研究对象">
+          <el-form :rules="rules" label-position="right" label-width="80px" :model="schemeForm">
+            <el-form-item label="研究对象" prop="target">
               <el-input v-model="schemeForm.target" />
             </el-form-item>
-            <el-form-item label="研究地点">
+            <el-form-item label="研究地点" prop="location">
               <el-input v-model="schemeForm.location" />
             </el-form-item>
-            <el-form-item label="研究时间">
+            <el-form-item label="研究时间" prop="time">
               <el-input v-model="schemeForm.time" />
             </el-form-item>
-            <el-form-item label="研究人物">
+            <el-form-item label="研究人物" prop="person">
               <el-input v-model="schemeForm.person" />
             </el-form-item>
-            <el-form-item label="研究方法">
-              <el-input
-                v-model="schemeForm.method"
-                type="textarea"
-                resize="none"
-                :rows="3"
-              />
+            <el-form-item label="研究方法" prop="method">
+              <el-input v-model="schemeForm.method" type="textarea" :rows="3" />
             </el-form-item>
           </el-form>
-          <picture-upload
-            :pictureList="schemePictureList"
-            @returnPictureList="returnSchemePictures"
-          ></picture-upload>
+        <div class="mflex">
+          <picture-upload :pictureList="schemePictureList" @returnPictureList="returnSchemePictures"></picture-upload>
+          <div class="tips">
+          <h5>说明：需要详细说明具体的研究方案/实验设计，建议从研究对象、研究时空维度、研究人员、研究方法五个方面说明。研究对象指该研究/实验的研究主题；研究时空维度指该研究/实验的所在区域的时间尺度、空间维度、研究步长、时空单位；研究人员指该研究/实验的执行人员；研究方法指该研究/实验涉及的方法、总体的流程图</h5>
+          <h5>形式：文本、流程图</h5>
+          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -128,6 +123,7 @@ import PictureUpload from "./PictureUpload.vue";
 import { saveDescription } from "@/api/request";
 import router from "@/router";
 import { notice } from "@/utils/notice";
+import type { FormRules } from 'element-plus'
 export default defineComponent({
   props: {
     descriptionValue: {
@@ -136,10 +132,14 @@ export default defineComponent({
   },
   components: { PictureUpload },
   setup(props) {
-    const backgroundValue = ref(
-      (props.descriptionValue as any).background.text
-    );
-    const purposeValue = ref((props.descriptionValue as any).purpose.text);
+    const backgroundForm = reactive({
+      backgroundValue: (props.descriptionValue as any).background.text
+    })
+
+    const purposeForm = reactive({
+      purposeValue:(props.descriptionValue as any).purpose.text
+    })
+
     const schemeForm = reactive({
       target: (props.descriptionValue as any).scheme.target,
       location: (props.descriptionValue as any).scheme.location,
@@ -157,6 +157,29 @@ export default defineComponent({
     const schemePictureList = ref(
       (props.descriptionValue as any).scheme.pictures
     );
+    const rules = reactive<FormRules>({
+      backgroundValue: [{
+        required: true,
+        message: '请输入研究背景',
+        trigger: 'blur'
+      }],
+      purposeValue: [{
+        required: true,
+        message: '请输入研究目的',
+        trigger: 'change'
+      }],
+      target: [{
+        required: true,
+        message: '请输入研究对象',
+        trigger: 'change'
+      }],
+      method: [{
+        required: true,
+        message: '请输入研究方法',
+        trigger: 'change'
+      }]
+
+    })
 
     const returnBackgroundPictures = (val: any[]) => {
       backgroundPictureList.value = [];
@@ -181,13 +204,30 @@ export default defineComponent({
     };
 
     const save = async () => {
+      if (backgroundForm.backgroundValue == '') {
+        notice("warning", "失败", "研究背景不能为空")
+        return
+      }
+      else if (purposeForm.purposeValue.value == '') {
+        notice("warning", "失败", "研究目的不能为空")
+        return
+      }
+      else if (schemeForm.target == '') {
+        notice("warning", "失败", "研究对象不能为空")
+        return
+      }
+      else if (schemeForm.method == '') {
+        notice("warning", "失败", "研究方法不能为空")
+        return
+      }
+
       const background = {
-        text: backgroundValue.value,
+        text: backgroundForm.backgroundValue,
         pictures: backgroundPictureList.value,
         videos: []
       }
       const purpose = {
-        text: purposeValue.value,
+        text: purposeForm.purposeValue,
         pictures: purposePictureList.value,
         videos: []
       }
@@ -206,14 +246,14 @@ export default defineComponent({
         scheme
       }
       const data = await saveDescription((router.currentRoute.value.params.apply as any).id, description)
-      if(data != null && (data as any).code === 0) {
+      if (data != null && (data as any).code === 0) {
         notice("success", "成功", "保存成功")
       }
     }
 
     return {
-      backgroundValue,
-      purposeValue,
+      backgroundForm,
+      purposeForm,
       schemeForm,
       backgroundPictureList,
       purposePictureList,
@@ -221,6 +261,7 @@ export default defineComponent({
       returnBackgroundPictures,
       returnPurposePictures,
       returnSchemePictures,
+      rules,
       save
     };
   },
@@ -233,6 +274,7 @@ export default defineComponent({
 
   .small-title {
     display: flex;
+
     .icon {
       height: 20px;
       width: 10px;
@@ -241,37 +283,53 @@ export default defineComponent({
       background: red;
     }
   }
+
   .body {
     .input {
       margin-bottom: 10px;
     }
   }
+
   .scheme {
     .body {
       display: flex;
+
       .left {
         padding: 0 10px;
         flex: 1;
+
         .left-item {
           display: flex;
+
           .left-text {
             line-height: 30px;
           }
+
           .value {
             width: calc(100% - 110px);
           }
         }
       }
+
       .right {
         padding: 0 10px;
         flex: 1;
       }
     }
   }
+
   .background,
   .purpose,
   .scheme {
     margin-bottom: 40px;
   }
+}
+.mflex{
+  display: flex;
+  align-items: flex-start
+}
+.tips{
+  margin-left: 30px;
+  color: rgb(150, 150, 150);
 }
 </style>

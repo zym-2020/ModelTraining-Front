@@ -1,6 +1,8 @@
 <template>
   <div class="method">
-    <div class="title"><h2>实验方法</h2></div>
+    <div class="title">
+      <h2>实验方法</h2>
+    </div>
     <el-divider />
     <div class="resource">
       <div class="small-title">
@@ -8,55 +10,53 @@
         <h4>研究资源</h4>
       </div>
       <div class="body">
-        <div class="left">
-          <el-tree
-            ref="tree"
-            :data="data"
-            :props="defaultProps"
-            default-expand-all
-            highlight-current
-            @node-click="nodeClick"
-            node-key="id"
-          />
-        </div>
-        <div class="right">
-          <div class="model-base-info">
-            <model-base-info
-              :modelBaseInfoValue="modelBaseInfoValue"
-              @returnModelBaseInfo="returnModelBaseInfo"
-              v-if="active === '1-1'"
-            ></model-base-info>
-            <model-meta-data
-              :modelMetaDataValue="modelMetaDataValue"
-              @returnModelMetaData="returnModelMetaData"
-              v-if="active === '1-2'"
-            ></model-meta-data>
-            <model-source
-              :modelSourceValue="modelSourceValue"
-              @returnModelSource="returnModelSource"
-              v-if="active === '1-3'"
-            ></model-source>
-            <data-base-info
-              :dataBaseInfoValue="dataBaseInfoValue"
-              @returnDataBase="returnDataBase"
-              v-if="active === '2-1'"
-            ></data-base-info>
-            <data-active
-              v-if="active === '2-2'"
-              :dataActiveValue="dataActiveValue"
-              @returnDataActive="returnDataActive"
-            ></data-active>
-            <data-source
-              :dataSourceValue="dataSourceValue"
-              @returnDataSource="returnDataSource"
-              v-if="active === '2-3'"
-            ></data-source>
-            <compute-resource
-              :computeResourceValue="computeResourceValue"
-              @returnComputResource="returnComputResource"
-              v-if="active === '3'"
-            ></compute-resource>
-          </div>
+        <div>
+          <el-tabs v-model="activeName" class="demo-tabs">
+            <el-tab-pane label="模型资源" name="1">
+              <el-table :data="Modeltemp" style="width: 100%" max-height="250">
+                <el-table-column align='center' prop="modelBaseInfo.name" label="模型资源名称" width="1200" />
+                <el-table-column align='center' fixed="right" label="操作" width="120">
+                  <template #default="scope">
+                    <el-button link type="primary" size="small" @click="updateModelClick(scope.$index)">
+                      查看
+                    </el-button>
+                    <el-button link type="primary" size="small" @click="deleteModelClick(scope.$index)">
+                      删除
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-button class="mt-4" style="width: 100%" @click="addModelClick">添加模型资源</el-button>
+              <el-dialog v-model="addModelDialog" width="600px" title="添加模型资源">
+                <addModel @returnModel="returnModel" @updateModel="updateModel" :modelItem="modelItem" :modeloperateType="modeloperateType"></addModel>
+              </el-dialog>
+            </el-tab-pane>
+            <el-tab-pane label="数据资源" name="2">
+              <el-table :data="Datatemp" style="width: 100%" max-height="250">
+                <el-table-column align='center' fixed prop="dataBaseInfo.name" label="数据资源名称" width="1200" />
+                <el-table-column align='center' fixed="right" label="操作" width="120">
+                  <template #default="scope">
+                    <el-button link type="primary" size="small" @click="updateDataClick(scope.$index)">
+                      查看
+                    </el-button>
+                    <el-button link type="primary" size="small" @click.prevent="deleteDataClick(scope.$index)">
+                      删除
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-button class="mt-4" style="width: 100%" @click="addDataClick">添加数据资源</el-button>
+              <el-dialog v-model="addDataDialog" width="600px" title="添加数据资源">
+                <addData @returnData="returnData" @updateData="updateData" :dataItem="dataItem" :dataoperateType="dataoperateType"></addData>
+              </el-dialog>
+            </el-tab-pane>
+            <el-tab-pane label="计算资源" name="3">
+              <ComputeResource :computeResourceValue="computeResourceValue"
+                @returnComputResource="returnComputResource">
+              </ComputeResource>
+              <el-button class="saveCompute" @click="addComputeClick">保存计算资源</el-button>
+            </el-tab-pane>
+          </el-tabs>
         </div>
       </div>
     </div>
@@ -66,10 +66,8 @@
         <h4>实验过程</h4>
       </div>
       <div>
-        <process
-          @returnProcessList="returnProcessList"
-          :initProcessList="initProcessList"
-        />
+        <process @returnProcessList="returnProcessList" :initProcessList="initProcessList" :Modeltemp="Modeltemp"
+          :Datatemp="Datatemp" />
       </div>
     </div>
     <div class="btn">
@@ -79,19 +77,15 @@
 </template>
 
 <script lang="ts">
-interface Tree {
-  id: string;
-  label: string;
-  children?: Tree[];
-}
 import {
   defineComponent,
   ref,
-  nextTick,
   computed,
   reactive,
   onMounted,
 } from "vue";
+import addModel from "./addModel.vue";
+import addData from "./addData.vue";
 import ModelBaseInfo from "./ModelBaseInfo.vue";
 import ModelMetaData from "./ModelMetaData.vue";
 import ModelSource from "./ModelSource.vue";
@@ -101,10 +95,16 @@ import DataSource from "./DataSource.vue";
 import ComputeResource from "./ComputeResource.vue";
 import Process from "./Process.vue";
 import router from "@/router";
-import { savaMethod } from "@/api/request";
+import { saveProcess } from "@/api/request";
+import { saveComputeResource } from "@/api/request";
+import { deleteModelResources } from "@/api/request";
+import { deleteDataResources } from "@/api/request";
 import { notice } from "@/utils/notice";
+import { isNull } from "lodash";
 export default defineComponent({
   components: {
+    addModel,
+    addData,
     ModelBaseInfo,
     ModelMetaData,
     ModelSource,
@@ -120,133 +120,168 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const addModelDialog = ref(false)
+    const addDataDialog = ref(false)
+    const modelList = ref<any[]>((props.methodValue as any).resource.modelResources);
+    const dataList = ref<any[]>((props.methodValue as any).resource.dataResources);
     const processes = ref<any[]>((props.methodValue as any).processes);
-
-    const modelBaseInfoValue = ref(
-      (props.methodValue as any).resource.modelResource.modelBaseInfo
-    );
-    const modelMetaDataValue = ref(
-      (props.methodValue as any).resource.modelResource.modelMetaData
-    );
-    const modelSourceValue = ref(
-      (props.methodValue as any).resource.modelResource.modelSource
-    );
-    const dataBaseInfoValue = ref(
-      (props.methodValue as any).resource.dataResource.dataBaseInfo
-    );
-    const dataActiveValue = ref(
-      (props.methodValue as any).resource.dataResource.dataActive
-    );
-    const dataSourceValue = ref(
-      (props.methodValue as any).resource.dataResource.dataSource
-    );
-    const computeResourceValue = ref(
-      (props.methodValue as any).resource.computeResource
-    );
+    const modelItem = ref<any>();
+    const dataItem = ref<any>();
+    const ModelIndex = ref(-1);
+    const DataIndex = ref(-1);
+    const modeloperateType = ref("add");
+    const dataoperateType = ref("add");
+    let Modeltemp = ref<any[]>(JSON.parse(JSON.stringify(modelList.value)))
+    let Datatemp = ref<any[]>(JSON.parse(JSON.stringify(dataList.value)))
+    const computeResourceValue = ref((props.methodValue as any).resource.computeResource);
 
     const active = ref("1-1");
-    const tree = ref();
     const defaultProps = {
       children: "children",
       label: "label",
     };
-    const data: Tree[] = [
-      {
-        id: "1",
-        label: "模型资源",
-        children: [
-          {
-            id: "1-1",
-            label: "基础信息",
-          },
-          {
-            id: "1-2",
-            label: "元数据信息",
-          },
-          {
-            id: "1-3",
-            label: "出处信息",
-          },
-        ],
-      },
-      {
-        id: "2",
-        label: "数据资源",
-        children: [
-          { id: "2-1", label: "基础信息" },
-          { id: "2-2", label: "活动信息" },
-          { id: "2-3", label: "出处信息/代理属性" },
-        ],
-      },
-      { id: "3", label: "计算资源" },
-    ];
 
+    const addModelClick = () => {
+      modelItem.value = {
+        modelId:'',
+        modelBaseInfo: {
+          name: '',
+          content: '',
+          description: '',
+          type: '',
+          storage: '',
+          version: '',
+          language: '',
+          other: ''
+        },
+        modelMetaData: {
+          hypothesis:'',
+          algorithm:'',
+          iterate:'',
+          version:'',
+          necessity:'',
+          demand:'',
+          modelInputs: [] as any[],
+          modelOutputs: [] as any[],
+          parameters:[] as any[],
+        },
+        modelSource: {
+          references:[] as any[],
+          publication:'',
+          develop:''
+        }
+      };
+      modeloperateType.value = "add"
+      addModelDialog.value = true;
+    };
+
+    const updateModelClick = (scope: number) => {
+      modelItem.value = modelList.value[scope]
+      modeloperateType.value = "update"
+      addModelDialog.value = true
+      ModelIndex.value = scope
+    }
+    const deleteModelClick = async (scope: number) => {
+      const data = await deleteModelResources(
+        (router.currentRoute.value.params.apply as any).id,
+        Modeltemp.value[scope]
+      );
+      if (data != null && (data as any).code === 0) {
+        Modeltemp.value.splice(scope, 1)
+        notice("success", "成功", "删除成功！");
+      }
+    }
+    const addDataClick = () => {
+      dataItem.value = {
+        dataId:'',
+      dataBaseInfo: {
+        name: '',
+        location: '',
+        description: '',
+        format: '',
+        version: '',
+        produceTime: '',
+        updateTime: '',
+        unit: '',
+        precision: '',
+        spacetimescales: [] as any[],
+        identifier: ''
+      },
+      dataActive: {
+        handle:'',
+        conversion:'',
+      },
+      dataSource: {
+        publish:'',
+        references:[] as any[],
+        license:'',
+        develop:''
+      }
+      };
+      modeloperateType.value = "add"
+      addDataDialog.value = true;
+    };
+
+    const updateDataClick = (scope: number) => {
+      dataItem.value = dataList.value[scope]
+      dataoperateType.value = "update"
+      addDataDialog.value = true
+      DataIndex.value = scope
+    }
+
+    const deleteDataClick = async (scope: number) => {
+      const data = await deleteDataResources(
+        (router.currentRoute.value.params.apply as any).id,
+        Datatemp.value[scope]
+      );
+      if (data != null && (data as any).code === 0) {
+        Datatemp.value.splice(scope, 1)
+        notice("success", "成功", "删除成功！");
+      }
+    }
+    const addComputeClick = async () => {
+      const computeResource = computeResourceValue.value
+      const data = await saveComputeResource(
+        (router.currentRoute.value.params.apply as any).id,
+        computeResource
+      );
+      if (data != null && (data as any).code === 0) {
+        notice("success", "成功", "保存成功！");
+      }
+    }
     const initProcessList = computed(() => {
       return (router.currentRoute.value.params.apply as any).method.processes;
     });
-
-    nextTick(() => {
-      tree.value.setCurrentKey("1-1");
-    });
-
-    const nodeClick = (data: any) => {
-      if (data.id != "1" && data.id != "2") {
-        active.value = data.id;
-      }
-    };
 
     const returnProcessList = (val: any[]) => {
       processes.value = val;
     };
 
-    const returnModelBaseInfo = (val: any) => {
-      modelBaseInfoValue.value = val;
-    };
-
-    const returnDataActive = (val: any) => {
-      dataActiveValue.value = val;
-    };
-
-    const returnModelMetaData = (val: any) => {
-      modelMetaDataValue.value = val;
-    };
-
-    const returnModelSource = (val: any) => {
-      modelSourceValue.value = val;
-    };
-
-    const returnDataBase = (val: any) => {
-      dataBaseInfoValue.value = val;
-    };
-
-    const returnDataSource = (val: any) => {
-      dataSourceValue.value = val;
-    };
-
     const returnComputResource = (val: any) => {
       computeResourceValue.value = val;
     };
+    const returnModel = (val: any) => {
+      Modeltemp.value.push(JSON.parse(JSON.stringify(val)))
+      addModelDialog.value = false
+    }
+    const updateModel = (val:any) =>{
+      Modeltemp.value.splice(ModelIndex.value,1,JSON.parse(JSON.stringify(val)))
+      addModelDialog.value = false
+    }
+    const updateData = (val:any) =>{
+      Datatemp.value.splice(DataIndex.value,1,JSON.parse(JSON.stringify(val)))
+      addDataDialog.value = false
+    }
+    const returnData = (val: any) => {
+      Datatemp.value.push(JSON.parse(JSON.stringify(val)))
+      addDataDialog.value = false
+    }
 
     const saveClick = async () => {
-      const method = {
-        processes: processes.value,
-        resource: {
-          computeResource: computeResourceValue.value,
-          dataResource: {
-            dataBaseInfo: dataBaseInfoValue.value,
-            dataActive: dataActiveValue.value,
-            dataSource: dataSourceValue.value,
-          },
-          modelResource: {
-            modelBaseInfo: modelBaseInfoValue.value,
-            modelMetaData: modelMetaDataValue.value,
-            modelSource: modelSourceValue.value,
-          },
-        },
-      };
-      const data = await savaMethod(
+      console.log(processes.value)
+      const data = await saveProcess(
         (router.currentRoute.value.params.apply as any).id,
-        method
+        processes.value
       );
       if (data != null && (data as any).code === 0) {
         notice("success", "成功", "保存成功！");
@@ -254,28 +289,35 @@ export default defineComponent({
     };
 
     return {
+      activeName: '1',
       active,
       defaultProps,
-      data,
-      nodeClick,
-      tree,
       returnProcessList,
       initProcessList,
-      dataActiveValue,
-      returnDataActive,
-      modelBaseInfoValue,
-      returnModelBaseInfo,
-      modelMetaDataValue,
-      returnModelMetaData,
-      modelSourceValue,
-      returnModelSource,
-      dataBaseInfoValue,
-      returnDataBase,
-      dataSourceValue,
-      returnDataSource,
       computeResourceValue,
       returnComputResource,
       saveClick,
+      modelItem,
+      dataItem,
+      modeloperateType,
+      dataoperateType,
+      Modeltemp,
+      Datatemp,
+      addModelDialog,
+      addDataDialog,
+      addModelClick,
+      updateModelClick,
+      deleteModelClick,
+      addDataClick,
+      updateDataClick,
+      deleteDataClick,
+      addComputeClick,
+      returnModel,
+      updateModel,
+      ModelIndex,
+      DataIndex,
+      returnData,
+      updateData
     };
   },
 });
@@ -284,8 +326,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 .method {
   padding-left: 20px;
+
   .small-title {
     display: flex;
+
     .icon {
       height: 20px;
       width: 10px;
@@ -294,30 +338,35 @@ export default defineComponent({
       background: red;
     }
   }
+
   .resource {
-    /deep/ .el-tree-node__label {
-      font-size: 16px;
-      font-family: “Trebuchet MS”, Arial, Helvetica, sans-serif;
-      color: #999999;
-    }
     .body {
       display: flex;
+
       .left {
         width: 300px;
       }
+
       .right {
         padding-left: 20px;
         width: calc(100% - 280px);
       }
     }
   }
+
   .resource,
   .step {
     margin-bottom: 40px;
   }
+
   .btn {
     text-align: center;
     margin: 40px 0px;
   }
+}
+
+.saveCompute {
+  width: 20%;
+  margin-left: 100px;
 }
 </style>

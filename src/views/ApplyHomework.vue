@@ -29,7 +29,7 @@
           <apply-home v-if="active == 'commit'" />
           <description v-if="active == 'description'" :descriptionValue="descriptionValue"/>
           <method v-if="active === 'method'" :methodValue="methodValue"/>
-          <result v-if="active === 'result'" :resultValue="resultValue"/>
+          <result v-if="active === 'result'" :resultValue="resultValue" :methodValue="methodValue"/>
         </div>
       </el-col>
     </el-row>
@@ -44,6 +44,8 @@ import Description from "@/components/Description.vue";
 import Method from "@/components/Method.vue";
 import Result from "@/components/Result.vue";
 import router from '@/router'
+
+import { getResource } from '@/api/request'
 export default defineComponent({
   components: { Team, ApplyHome, Description, Method, Result },
   setup() {
@@ -74,12 +76,13 @@ export default defineComponent({
       resultValue.value = (router.currentRoute.value.params.apply as any).result
     })
 
+
     return {
       active,
       selectHandle,
       descriptionValue,
       methodValue,
-      resultValue
+      resultValue,
     };
   },
 });

@@ -1,13 +1,13 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="100px" :model="source">
-      <el-form-item label="参考文献">
+    <el-form label-position="right" label-width="110px" :model="source" :rules="rules">
+      <el-form-item label="参考文献" prop="references">
         <el-input v-model="source.references" @change="changeHandle" />
       </el-form-item>
-      <el-form-item label="出版组织机构">
+      <el-form-item label="出版组织机构" prop="publication">
         <el-input v-model="source.publication" @change="changeHandle" />
       </el-form-item>
-      <el-form-item label="发展机构">
+      <el-form-item label="发展机构" prop="develop">
         <el-input v-model="source.develop" @change="changeHandle" />
       </el-form-item>
     </el-form>
@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive } from "vue";
+import type {  FormRules } from 'element-plus'
 export default defineComponent({
   props: {
     modelSourceValue: {
@@ -33,10 +34,15 @@ export default defineComponent({
     const changeHandle = () => {
       context.emit("returnModelSource", source);
     };
-
+    const rules = reactive<FormRules>({
+      publication: [
+        { required: true, message: '请输入出版组织机构', trigger: 'change' }
+      ]
+      })
     return {
       source,
-      changeHandle
+      changeHandle,
+      rules
     };
   },
 });

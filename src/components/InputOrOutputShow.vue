@@ -8,19 +8,25 @@
         :name="index"
       >
         <div>
-          <div class="item" v-if="item.type === 'input'">
-            <div><strong>类型：</strong></div>
-            <div>
-              <el-tag>{{ item.dataType }}</el-tag>
-            </div>
-          </div>
-          <div class="item" v-else>
-            <div><strong>格式：</strong></div>
-            <div class="text">{{ item.format }}</div>
+          <div class="item">
+            <div><strong>名称：</strong></div>
+            <div class="text">{{ item.name }}</div>
           </div>
           <div class="item">
             <div><strong>描述：</strong></div>
             <div class="text">{{ item.description }}</div>
+          </div>
+          <div class="item">
+            <div><strong>格式：</strong></div>
+            <div class="text">{{ item.format }}</div>
+          </div>
+          <div class="item">
+            <div><strong>单位：</strong></div>
+            <div class="text">{{ item.unit }}</div>
+          </div>
+          <div class="item">
+            <div><strong>默认值：</strong></div>
+            <div class="text">{{ item.defaultValue }}</div>
           </div>
         </div>
       </el-collapse-item>
@@ -32,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, ref } from "vue";
 export default defineComponent({
   props: {
     info: {
@@ -40,10 +46,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const info = computed(() => {
-      return props.info;
-    });
-
+    const info  = ref<any[]>(props.info as any[]);
     return {
       info,
     };

@@ -53,14 +53,14 @@
         <div class="icon"></div>
         <h4>结果验证</h4>
       </div>
-      <div class="example">
+      <!-- <div class="example">
         <div class="example-text"><strong>示例：</strong></div>
         <el-timeline>
           <el-timeline-item center timestamp="步骤1" placement="top">
             <process-card :stepInfo="step1"></process-card>
           </el-timeline-item>
         </el-timeline>
-      </div>
+      </div> -->
 
       <el-timeline>
         <el-timeline-item
@@ -70,7 +70,7 @@
           :timestamp="'步骤' + (index + 1)"
           placement="top"
         >
-          <process-card :stepInfo="item">
+          <process-card :stepInfo="item" class="card">
             <template #button>
               <div class="button">
                 <el-button
@@ -106,6 +106,9 @@
       @updateProcess="updateProcess"
       :operateType="operateType"
       :processItem="processItem"
+      :processType="processType"
+      :Modeltemp="Modeltemp" 
+      :Datatemp="Datatemp"
     ></add-process>
   </el-dialog>
 </template>
@@ -119,10 +122,14 @@ import router from "@/router";
 import { step1 } from "@/utils/ExampleData";
 import { saveResult } from "@/api/request";
 import { notice } from "@/utils/notice";
+import { Delete, Edit } from "@element-plus/icons-vue";
 export default defineComponent({
   components: { ResultForm, ProcessCard, AddProcess },
   props: {
     resultValue: {
+      type: Object,
+    },
+    methodValue: {
       type: Object,
     },
   },
@@ -132,7 +139,11 @@ export default defineComponent({
     const operateType = ref("add");
     const updateIndex = ref(-1);
     const resultFormValue = ref((props.resultValue as any).resultOutput);
-
+    const processType = ref("result")
+    const modelList = ref<any[]>((props.methodValue as any).resource.modelResources);
+    const dataList = ref<any[]>((props.methodValue as any).resource.dataResources);
+    let Modeltemp = ref<any[]>(JSON.parse(JSON.stringify(modelList.value)))
+    let Datatemp = ref<any[]>(JSON.parse(JSON.stringify(dataList.value)))
     const processList = ref<any[]>(
       (props.resultValue as any).resultValidations
     );
@@ -147,6 +158,22 @@ export default defineComponent({
     };
 
     const saveClick = async () => {
+      if(!resultFormValue.value.name){
+        notice("warning", "失败", "“结果名称”不能为空")
+        return
+      }
+      if(!resultFormValue.value.description){
+        notice("warning", "失败", "“结果描述”不能为空")
+        return
+      }
+      if(!resultFormValue.value.format){
+        notice("warning", "失败", "“结果格式”不能为空")
+        return
+      }
+      if(!resultFormValue.value.time){
+        notice("warning", "失败", "“生产时间”不能为空")
+        return
+      }
       const result = {
         resultValidations: processList.value,
         resultOutput: resultFormValue.value,
@@ -166,10 +193,11 @@ export default defineComponent({
         stepType: "",
         operateType: "",
         description: "",
-        reference: "",
+        references: [] ,
         other: "",
         pictures: [],
-        processResources: [],
+        modelResources: [],
+        dataResources: [],
       };
       operateType.value = "add";
       addFlag.value = true;
@@ -202,7 +230,14 @@ export default defineComponent({
       deleteClick,
       editClick,
       addProcessClick,
-      updateProcess
+      updateProcess,
+      processItem,
+      operateType,
+      processType,
+      Modeltemp,
+      Datatemp,
+      Delete,
+      Edit,
     };
   },
 });
@@ -270,4 +305,15 @@ export default defineComponent({
     margin: 40px 0;
   }
 }
+.card {
+  position: relative;
+
+  .button {
+    position: absolute;
+    z-index: 99;
+    top: 20px;
+    right: 40px;
+  }
+}
+
 </style>

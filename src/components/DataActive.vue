@@ -1,10 +1,10 @@
 <template>
   <div>
-    <el-form label-position="right" label-width="100px" :model="dataActive">
-      <el-form-item label="数据处理步骤">
+    <el-form label-position="right" label-width="110px" :model="dataActive" :rules="rules">
+      <el-form-item label="数据处理步骤" prop="handle">
         <el-input v-model="dataActive.handle" @change="changeHandle" />
       </el-form-item>
-      <el-form-item label="数据转换步骤">
+      <el-form-item label="数据转换步骤" prop="conversion">
         <el-input v-model="dataActive.conversion" />
       </el-form-item>
     </el-form>
@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive } from "vue";
+import type {  FormRules } from 'element-plus'
 export default defineComponent({
   props: {
     dataActiveValue: {
@@ -29,10 +30,18 @@ export default defineComponent({
     const changeHandle = () => {
       context.emit("returnDataActive", dataActive);
     };
-
+    const rules = reactive<FormRules>({
+      handle: [
+        { required: true, message: '请输入数据处理步骤', trigger: 'change' }
+      ],
+/*       conversion: [
+        { required: true, message: '请输入数据转换步骤', trigger: 'change' }
+      ], */
+      })
     return {
       dataActive,
-      changeHandle
+      changeHandle,
+      rules
     };
   },
 });
