@@ -2,7 +2,7 @@
   <div class="main">
     <el-row>
       <el-col :span="12" v-for="(item, index) in data" :key="index">
-        <div :class="'module item' + index"  @click="toNav(item.path)">
+        <div :class="'module item' + index" @click="toNav(item.path)">
           <p class="itemTitle">{{ item.title }}</p>
         </div>
       </el-col>
@@ -19,7 +19,8 @@ interface DataType {
   path: string;
 }
 import { defineComponent, ref } from "vue";
-import router from '@/router'
+import router from "@/router";
+import { notice } from "@/utils/notice";
 export default defineComponent({
   setup() {
     const data = ref<DataType[]>([
@@ -46,12 +47,16 @@ export default defineComponent({
     ]);
 
     const toNav = (type: string) => {
-      router.push({path: type})
-    }
+      if (type === "/homework") {
+        router.push({ path: type });
+      } else {
+        notice("warning", "警告", "该页面暂未开放！");
+      }
+    };
 
     return {
       data,
-      toNav
+      toNav,
     };
   },
 });
@@ -68,14 +73,14 @@ export default defineComponent({
     opacity: 1;
   }
 }
-.itemTitle{
-   margin-left: 150px;
-   margin-top: 90px;
-   font-size:30px;
-   font-weight:900;
-   color: #ffffff;
-   text-shadow: 5px 5px 5px #000000;
-   position: relative;
+.itemTitle {
+  margin-left: 150px;
+  margin-top: 90px;
+  font-size: 30px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 5px 5px 5px #000000;
+  position: relative;
 }
 .main {
   height: calc(100vh - 260px);
@@ -93,10 +98,10 @@ export default defineComponent({
         cursor: pointer;
       }
       .item0 {
-        background: rgb(145, 135, 225); 
-        background-image:url("../../public/img/icons/work.png");
-        background-size:40% 60%;
-        background-repeat:no-repeat ;
+        background: rgb(145, 135, 225);
+        background-image: url("../../public/img/icons/work.png");
+        background-size: 40% 60%;
+        background-repeat: no-repeat;
         background-position: right bottom;
         right: 15px;
         bottom: 15px;
@@ -108,9 +113,9 @@ export default defineComponent({
       }
       .item1 {
         background: rgb(214, 135, 225);
-        background-image:url("../../public/img/icons/apply.png");
-        background-size:40% 60%;
-        background-repeat:no-repeat ;
+        background-image: url("../../public/img/icons/apply.png");
+        background-size: 40% 60%;
+        background-repeat: no-repeat;
         background-position: right bottom;
         left: 15px;
         bottom: 15px;
@@ -122,9 +127,9 @@ export default defineComponent({
       }
       .item2 {
         background: rgb(225, 135, 135);
-        background-image:url("../../public/img/icons/develop.png");
-        background-size:40% 60%;
-        background-repeat:no-repeat ;
+        background-image: url("../../public/img/icons/develop.png");
+        background-size: 40% 60%;
+        background-repeat: no-repeat;
         background-position: right bottom;
         right: 15px;
         top: 15px;
@@ -136,9 +141,9 @@ export default defineComponent({
       }
       .item3 {
         background: rgb(225, 171, 135);
-        background-image:url("../../public/img/icons/certificate.png");
-        background-size:30% 60%;
-        background-repeat:no-repeat ;
+        background-image: url("../../public/img/icons/certificate.png");
+        background-size: 30% 60%;
+        background-repeat: no-repeat;
         background-position: right bottom;
         left: 15px;
         top: 15px;

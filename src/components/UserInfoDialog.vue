@@ -38,7 +38,7 @@ export default defineComponent({
     onMounted(async () => {
       const data = await getUserInfo()
       if(data != null && (data as any).code === 0) {
-        name.value = data.data.name
+        name.value = data.data.name 
         teamId.value = data.data.teamId
       }
     })

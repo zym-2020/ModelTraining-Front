@@ -37,46 +37,46 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
-  {
-    path: '/apply',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'Apply',
-        component: () => import('@/views/ApplyHomework.vue')
-      }
-    ]
-  },
-  {
-    path: '/develp',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'Develp',
-        component: () => import('@/views/DevelopHomework.vue'),
-        children:[
-          {
-            path:'',
-            name: 'WangEditor3',
-            component: () => import('@/layout/components/wangEditor.vue')
-          }
-        ]
-      }
-    ]
-  },
-  {
-    path: '/certificate',
-    component: Layout,
-    children: [
-      {
-        path: '',
-        name: 'certificate',
-        component: () => import('@/views/Certificate.vue')
-      }
-    ]
-  }
+  // {
+  //   path: '/apply',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'Apply',
+  //       component: () => import('@/views/ApplyHomework.vue')
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/develp',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'Develp',
+  //       component: () => import('@/views/DevelopHomework.vue'),
+  //       children:[
+  //         {
+  //           path:'',
+  //           name: 'WangEditor3',
+  //           component: () => import('@/layout/components/wangEditor.vue')
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/certificate',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'certificate',
+  //       component: () => import('@/views/Certificate.vue')
+  //     }
+  //   ]
+  // }
 ]
 
 const router = createRouter({

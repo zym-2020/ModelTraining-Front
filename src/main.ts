@@ -5,6 +5,8 @@ import router from './router'
 import { store } from './store'
 import ElementPlus from 'element-plus'
 import * as Icons from '@element-plus/icons'
+import '@/assets/iconfont/iconfont.css'
+import '@/assets/iconfont/iconfont.js'
 import 'element-plus/dist/index.css'
 import './permission'
 

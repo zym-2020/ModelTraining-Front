@@ -3,11 +3,11 @@
   <el-form :model="formLabelAlign" class="inform">
     <h3>模型培训提交系统</h3>
     <el-divider/>
-      <el-form-item label="账号">
-        <el-input v-model="formLabelAlign.teamId" placeholder="请输入账号"/>
+      <el-form-item label="邮箱">
+        <el-input v-model="formLabelAlign.email" placeholder="请输入邮箱"/>
       </el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="formLabelAlign.name" placeholder="请输入密码"/>
+      <el-form-item label="姓名">
+        <el-input v-model="formLabelAlign.name" placeholder="请输入姓名"/>
       </el-form-item>
   </el-form>
   <el-button type="primary" @click="loginClick">登录</el-button>
@@ -24,13 +24,13 @@ export default defineComponent({
   setup() {
     // const store = useStore();
     const formLabelAlign = reactive({
-      teamId: "",
+      email: "",
       name: "",
     });
 
     const loginClick = async () => {
       await store.dispatch("login", {
-        teamId: formLabelAlign.teamId,
+        email: formLabelAlign.email,
         name: formLabelAlign.name,
       });
     };

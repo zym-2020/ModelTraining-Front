@@ -1,7 +1,7 @@
 <template>
   <div class="head-main">
     <div class="logo">
-      <img src="/log/earth.png" alt="" height="50" @click="toNav('/')"/>
+      <img src="/log/earth.png" alt="" height="50" @click="toNav('/')" />
     </div>
     <div class="menu">
       <div class="menu-item" @click="toNav('/homework')">模型作业</div>
@@ -25,18 +25,23 @@
 import { defineComponent, ref } from "vue";
 import UserInfoDialog from "@/components/UserInfoDialog.vue";
 import router from "@/router";
+import { notice } from "@/utils/notice";
 export default defineComponent({
   components: { UserInfoDialog },
   setup() {
     const userInfoFlag = ref(false);
 
     const toNav = (type: string) => {
-      router.push({ path: type });
+      if (type === "/homework") {
+        router.push({ path: type });
+      } else {
+        notice("warning", "警告", "页面暂未开放");
+      }
     };
 
     return {
       userInfoFlag,
-      toNav
+      toNav,
     };
   },
 });
