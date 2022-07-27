@@ -1,19 +1,36 @@
 <template>
   <div class="head-main">
     <div class="logo">
-      <img src="/log/earth.png" alt="" height="50" @click="toNav('/')" />
+      <img src="/modelTrainingCourse/submission/log/earth.png" alt="" height="50" @click="toNav('/modelTrainingCourse/submission')" />
     </div>
     <div class="menu">
-      <div class="menu-item" @click="toNav('/homework')">模型作业</div>
-      <div class="menu-item" @click="toNav('/apply')">模型应用竞赛</div>
-      <div class="menu-item" @click="toNav('/develp')">模型开发竞赛</div>
-      <div class="menu-item" @click="toNav('/certificate')">证书</div>
+      <div
+        :class="active === 1 ? 'menu-item active' : 'menu-item'"
+        @click="toNav('/modelTrainingCourse/submission/homework')"
+      >
+        模型作业
+      </div>
+      <div
+        :class="active === 2 ? 'menu-item active' : 'menu-item'"
+        @click="toNav('/apply')"
+      >
+        模型应用竞赛
+      </div>
+      <div
+        :class="active === 3 ? 'menu-item active' : 'menu-item'"
+        @click="toNav('/develp')"
+      >
+        模型开发竞赛
+      </div>
+      <div
+        :class="active === 4 ? 'menu-item active' : 'menu-item'"
+        @click="toNav('/certificate')"
+      >
+        证书
+      </div>
     </div>
     <div class="avatar">
-      <el-avatar
-        src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-        @click="userInfoFlag = true"
-      />
+      <el-avatar src="/modelTrainingCourse/submission/avatar.png" @click="userInfoFlag = true" />
     </div>
   </div>
   <el-dialog v-model="userInfoFlag" title="学员信息" width="400px">
@@ -30,16 +47,22 @@ export default defineComponent({
   components: { UserInfoDialog },
   setup() {
     const userInfoFlag = ref(false);
+    const active = ref(0);
 
     const toNav = (type: string) => {
-      if (type === "/homework") {
+      if (type === "/modelTrainingCourse/submission/homework") {
         router.push({ path: type });
+        active.value = 1;
+      } else if (type === "/modelTrainingCourse/submission") {
+        router.push({ path: type });
+        active.value = 0;
       } else {
         notice("warning", "警告", "页面暂未开放");
       }
     };
 
     return {
+      active,
       userInfoFlag,
       toNav,
     };
@@ -57,18 +80,24 @@ export default defineComponent({
   line-height: 60px;
   .logo {
     margin-left: 100px;
+    cursor: pointer;
   }
   .menu {
     display: flex;
     left: 400px;
     position: relative;
     .menu-item {
-      padding: 0 20px;
+      margin: 0 20px;
       cursor: pointer;
       font-size: 18px;
+
       &:hover {
         color: #76c1e4;
       }
+    }
+    .active {
+      box-sizing: border-box;
+      border-bottom: solid 2px #76c1e4;
     }
   }
   .avatar {

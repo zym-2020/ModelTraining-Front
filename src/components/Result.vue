@@ -37,7 +37,7 @@
             <div class="example-item-value">2020.01</div>
           </div>
           <div style="margin-top: 10px">
-            <img src="/example/2.png" alt="" />
+            <img src="/modelTrainingCourse/submission/example/2.png" alt="" />
           </div>
         </div>
         <div class="result-value">

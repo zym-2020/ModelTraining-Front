@@ -4,7 +4,7 @@ import Layout from '@/layout/Index.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/modelTrainingCourse/submission',
     component: Layout,
     children: [
       {
@@ -15,25 +15,18 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: '/login',
+    path: '/modelTrainingCourse/submission/login',
     name: 'Login',
     component: () => import("@/views/Login.vue")
   },
   {
-    path: '/homework',
+    path: '/modelTrainingCourse/submission/homework',
     component: Layout,
     children: [
       {
         path: '',
         name: 'Homework',
         component: () => import('@/views/Homework.vue'),
-        children:[
-          {
-            path:'',
-            name: 'WangEditor1',
-            component: () => import('@/layout/components/wangEditor.vue')
-          }
-        ]
       }
     ]
   },
@@ -77,6 +70,16 @@ const routes: Array<RouteRecordRaw> = [
   //     }
   //   ]
   // }
+  {
+    path: '/modelTrainingCourse/submission/404',
+    name: '404',
+    component: () => import("@/views/404.vue")
+  },
+  {
+    path: "/:catchAll(.*)",
+    name: 'Redirect404',
+    redirect: '/modelTrainingCourse/submission/404'
+  }
 ]
 
 const router = createRouter({

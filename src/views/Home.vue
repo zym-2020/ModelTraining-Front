@@ -27,7 +27,7 @@ export default defineComponent({
       {
         title: "模型作业",
         des: "这是模型作业模块",
-        path: "/homework",
+        path: "/modelTrainingCourse/submission/homework",
       },
       {
         title: "模型应用竞赛",
@@ -47,7 +47,7 @@ export default defineComponent({
     ]);
 
     const toNav = (type: string) => {
-      if (type === "/homework") {
+      if (type === "/modelTrainingCourse/submission/homework") {
         router.push({ path: type });
       } else {
         notice("warning", "警告", "该页面暂未开放！");

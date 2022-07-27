@@ -95,6 +95,7 @@ import {
   removeFile,
   download,
   commit,
+  getUserInfo
 } from "@/api/request";
 import { InfoFilled } from "@element-plus/icons-vue";
 export default defineComponent({
@@ -152,7 +153,12 @@ export default defineComponent({
     };
 
     const handleDownload = async () => {
-      await download(props.index as string, currentFile.value);
+      const data = await getUserInfo()
+      // await download(props.index as string, currentFile.value);
+      if(data != null && (data as any).code === 0) {
+        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/homework/download/${data.data.memberId}/${props.index}`
+      }
+      
     };
 
     const submitUpload = async () => {

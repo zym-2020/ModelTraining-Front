@@ -2,13 +2,18 @@
   <div class="user-info-dialog">
     <div>
       <el-avatar
-        src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+        src="/modelTrainingCourse/submission/avatar.png"
         :size="100"
       />
     </div>
-    <div class="info">
-      <div class="info-item">
+    <el-skeleton :rows="4" animated v-if="skeletonFlag"/>
+    <div class="info" v-else>
+      <div class="info-item" v-if="memberId != ''">
         <strong>学员编号：</strong>
+        {{ memberId }}
+      </div>
+      <div class="info-item" v-if="teamId != ''">
+        <strong>竞赛编号：</strong>
         {{ teamId }}
       </div>
       <div class="info-item">
@@ -28,25 +33,31 @@ import { getUserInfo } from "@/api/request";
 import { store } from "@/store";
 export default defineComponent({
   setup() {
-    const name = ref("")
-    const teamId = ref("")
+    const name = ref("");
+    const memberId = ref("");
+    const teamId = ref("");
+    const skeletonFlag = ref(true)
 
     const layoutClick = () => {
       store.dispatch("logout");
     };
 
     onMounted(async () => {
-      const data = await getUserInfo()
-      if(data != null && (data as any).code === 0) {
-        name.value = data.data.name 
-        teamId.value = data.data.teamId
+      const data = await getUserInfo();
+      if (data != null && (data as any).code === 0) {
+        name.value = data.data.name;
+        memberId.value = data.data.memberId;
+        teamId.value = data.data.teamId;
       }
-    })
+      skeletonFlag.value = false
+    });
 
     return {
       name,
+      memberId,
       teamId,
       layoutClick,
+      skeletonFlag
     };
   },
 });

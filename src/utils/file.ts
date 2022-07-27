@@ -27,7 +27,7 @@ export async function handlePostFiles(chunkList: string[], fileChunk: { file: Bl
                 formData.append("file", fileChunk[parseInt(name as string)].file)
                 formData.append("name", name as string)
                 formData.append("number", number)
-                axios.post('/model/homework/uploadFile', formData, {
+                axios.post('/modelTrainingCourse/submission/model/homework/uploadFile', formData, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

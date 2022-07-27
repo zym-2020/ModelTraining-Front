@@ -3,15 +3,16 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { RouteLocationNormalized } from 'vue-router'
 import { getToken } from '@/utils/auth'
-import { getByTeamId } from '@/api/request'
+import { getByTeamId, getUserInfo } from '@/api/request'
+import { notice } from './utils/notice'
 
 NProgress.configure({ showSpinner: false })
 router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
     NProgress.start()
     // console.log('token', getToken())
     if (getToken() != null) {
-        if (to.path === '/login') {
-            next({ path: '/' })
+        if (to.path === '/modelTrainingCourse/submission/login') {
+            next({ path: '/modelTrainingCourse/submission' })
             NProgress.done()
         } else {
             if (to.name === 'Apply') {
@@ -21,17 +22,30 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
                     next()
                     NProgress.done()
                 }
+            } else if (to.name === 'Homework') {
+                const data = await getUserInfo()
+                if (data != null && (data as any).code === 0) {
+                    if (data.data.memberId != '') {
+                        next()
+                        NProgress.done()
+
+                    } else {
+                        notice('warning', '警告', '培训班您尚未报名，暂无访问权限')
+                        next('/modelTrainingCourse/submission/404')
+                        NProgress.done()
+                    }
+                }
             } else {
                 next()
                 NProgress.done()
             }
         }
     } else {
-        if (to.path === '/login') {
+        if (to.path === '/modelTrainingCourse/submission/login') {
             next()
             NProgress.done
         } else {
-            next('/login')
+            next('/modelTrainingCourse/submission/login')
             NProgress.done
         }
     }

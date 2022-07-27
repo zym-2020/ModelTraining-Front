@@ -27,7 +27,7 @@ export const userActions: ActionTree<UserState, RootState> & Actions = {
             } else if (data.code === 0) {
                 setToken(data.data.token)
                 notice('success', '成功', '登录成功')
-                router.push({ path: '/' })
+                router.push({ path: '/modelTrainingCourse/submission' })
             } else {
                 notice('error', '失败', '登录失败！')
             }
@@ -38,7 +38,7 @@ export const userActions: ActionTree<UserState, RootState> & Actions = {
         localStorage.clear()
         commit("SET_NAME", "")
         commit("SET_TEAM_ID", '')
-        router.push({ path: '/login' })
+        router.push({ path: '/modelTrainingCourse/submission/login' })
     },
 
 

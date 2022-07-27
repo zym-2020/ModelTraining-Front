@@ -80,7 +80,7 @@
             </div>
           </div>
           <div>
-            <img src="/example/1.png" alt="" />
+            <img src="/modelTrainingCourse/submission/example/1.png" alt="" />
           </div>
         </div>
         <div class="right">

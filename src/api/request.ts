@@ -42,7 +42,7 @@ export async function commit(number: string) {
 }
 
 export async function download(number: string, name: string) {
-    axios.get(`/model/homework/download/${number}`, {
+    axios.get(`/modelTrainingCourse/submission/model/homework/download/${number}`, {
         responseType: 'blob',
         headers: {
             Authorization: `Bearer ${getToken()}`
