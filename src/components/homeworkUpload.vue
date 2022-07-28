@@ -87,10 +87,9 @@ import type {
   UploadFile,
 } from "element-plus";
 import { notice } from "@/utils/notice";
-import { createFileChunk, handlePostFiles } from "@/utils/file";
+import { createFileChunk, handlePostFiles, checkMergeStatus } from "@/utils/file";
 import {
   mergeFiles,
-  checkState,
   clearTemp,
   removeFile,
   download,
@@ -191,21 +190,32 @@ export default defineComponent({
         total: files.length,
       });
       if (key != null && (key as any).code === 0) {
-        let state = await checkState(key.data);
-        while (state.data === 0) {
-          setTimeout(async () => {
-            state = await checkState(key.data);
-          }, 1500);
+        function check(res: number) {
+          if (res === 1) {
+            notice("success", "成功", "上传成功!");
+            currentFile.value = uploadFile.value.name;
+            upload.value!.clearFiles();
+            uploadFile.value = undefined;
+            uploadFlag.value = false;
+          } else {
+            notice("error", "失败", "上传失败！");
+          }
         }
-        if (state.data === 1) {
-          notice("success", "成功", "上传成功!");
-          currentFile.value = uploadFile.value.name;
-        } else {
-          notice("error", "失败", "上传失败！");
-        }
-        upload.value!.clearFiles();
-        uploadFile.value = undefined;
-        uploadFlag.value = false;
+        await checkMergeStatus(key.data, check);
+        // while (state.data === 0) {
+        //   setTimeout(async () => {
+        //     state = await checkState(key.data);
+        //   }, 1500);
+        // }
+        // if (state.data === 1) {
+        //   notice("success", "成功", "上传成功!");
+        //   currentFile.value = uploadFile.value.name;
+        // } else {
+        //   notice("error", "失败", "上传失败！");
+        // }
+        // upload.value!.clearFiles();
+        // uploadFile.value = undefined;
+        // uploadFlag.value = false;
       }
     };
 

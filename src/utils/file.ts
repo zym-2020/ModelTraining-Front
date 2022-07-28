@@ -1,4 +1,5 @@
 import { getToken } from '@/utils/auth'
+import { checkState } from '@/api/request'
 import axios from 'axios';
 
 
@@ -56,3 +57,25 @@ export async function handlePostFiles(chunkList: string[], fileChunk: { file: Bl
         }
     })
 }
+
+export async function checkMergeStatus(key: string, callback: (res: number) => void) {
+    async function handle() {
+        const response = await new Promise(async (res, rej) => {
+            res(await checkMerge(key));
+        });
+        if (response === 0) {
+            setTimeout(async () => {
+                await handle();
+            }, 2000);
+        } else {
+            callback(response as number)
+        }
+    }
+    await handle()
+}
+
+export async function checkMerge(key: string) {
+    const state = await checkState(key)
+    return state.data
+}
+

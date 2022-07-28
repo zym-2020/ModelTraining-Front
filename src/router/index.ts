@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
 import Layout from '@/layout/Index.vue'
+import Login from '@/views/Login.vue'
+import Homework from '@/views/Homework.vue'
+import P404 from '@/views/404.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -17,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/modelTrainingCourse/submission/login',
     name: 'Login',
-    component: () => import("@/views/Login.vue")
+    component: Login
   },
   {
     path: '/modelTrainingCourse/submission/homework',
@@ -26,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'Homework',
-        component: () => import('@/views/Homework.vue'),
+        component: Homework,
       }
     ]
   },
@@ -73,7 +76,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/modelTrainingCourse/submission/404',
     name: '404',
-    component: () => import("@/views/404.vue")
+    component: P404
   },
   {
     path: "/:catchAll(.*)",
