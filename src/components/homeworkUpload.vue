@@ -87,14 +87,18 @@ import type {
   UploadFile,
 } from "element-plus";
 import { notice } from "@/utils/notice";
-import { createFileChunk, handlePostFiles, checkMergeStatus } from "@/utils/file";
+import {
+  createFileChunk,
+  handlePostFiles,
+  checkMergeStatus,
+} from "@/utils/file";
 import {
   mergeFiles,
   clearTemp,
   removeFile,
   download,
   commit,
-  getUserInfo
+  getUserInfo,
 } from "@/api/request";
 import { InfoFilled } from "@element-plus/icons-vue";
 export default defineComponent({
@@ -109,7 +113,7 @@ export default defineComponent({
       type: Number,
     },
   },
-  emits: ['changeState'],
+  emits: ["changeState"],
   setup(props, context) {
     const upload = ref<UploadInstance>();
     const uploadFile = ref<any>();
@@ -144,7 +148,7 @@ export default defineComponent({
         if (data != null && (data as any).code === 0) {
           notice("success", "成功", "提交成功!");
           state.value = 1;
-          context.emit('changeState', props.index)
+          context.emit("changeState", props.index);
         }
       } else {
         notice("error", "错误", "请先上传文件再提交");
@@ -152,12 +156,11 @@ export default defineComponent({
     };
 
     const handleDownload = async () => {
-      const data = await getUserInfo()
+      const data = await getUserInfo();
       // await download(props.index as string, currentFile.value);
-      if(data != null && (data as any).code === 0) {
-        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/homework/download/${data.data.memberId}/${props.index}`
+      if (data != null && (data as any).code === 0) {
+        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/homework/download/${data.data.memberId}/${props.index}`;
       }
-      
     };
 
     const submitUpload = async () => {
@@ -183,6 +186,10 @@ export default defineComponent({
       );
       if (chunkList.length > 0) {
         notice("error", "错误", "文件上传时出错！");
+        upload.value!.clearFiles();
+        uploadFile.value = undefined;
+        uploadFlag.value = false;
+        return;
       }
       const key = await mergeFiles({
         number: props.index as string,
