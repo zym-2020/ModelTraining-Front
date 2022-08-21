@@ -115,3 +115,8 @@ export async function updateModelResources(id: string, jsonData: any) {
 export async function updateDataResources(id: string, jsonData: any) {
     return await patch(`/apply/updateDataResources/${id}`, jsonData)
 }
+
+//certificate相关接口
+export async function getAddress() {
+    return await get(`/certificate/getAddress`)
+}

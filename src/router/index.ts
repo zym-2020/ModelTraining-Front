@@ -62,17 +62,17 @@ const routes: Array<RouteRecordRaw> = [
   //     }
   //   ]
   // },
-  // {
-  //   path: '/certificate',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: '',
-  //       name: 'certificate',
-  //       component: () => import('@/views/Certificate.vue')
-  //     }
-  //   ]
-  // }
+  {
+    path: '/modelTrainingCourse/submission/certificate',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Certificate',
+        component: () => import('@/views/Certificate.vue')
+      }
+    ]
+  },
   {
     path: '/modelTrainingCourse/submission/404',
     name: '404',

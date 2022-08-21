@@ -54,6 +54,7 @@
       :on-exceed="handleExceed"
       accept=".doc,.docx"
       :auto-upload="false"
+      :disabled="state === 1"
     >
       <template #trigger>
         <el-button type="primary" class="open-file" :disabled="state === 1"
@@ -120,7 +121,7 @@ export default defineComponent({
     const currentFile = ref<string>(props.currentFileName as string);
     const uploadFlag = ref(false);
     const percentage = ref(0);
-    const state = ref(props.state as number);
+    const state = ref(1);
 
     const handleExceed: UploadProps["onExceed"] = (files) => {
       upload.value!.clearFiles();

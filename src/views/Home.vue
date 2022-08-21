@@ -42,12 +42,12 @@ export default defineComponent({
       {
         title: "证书发放",
         des: "这是证书发放模块",
-        path: "/certificate",
+        path: "/modelTrainingCourse/submission/certificate",
       },
     ]);
 
     const toNav = (type: string) => {
-      if (type === "/modelTrainingCourse/submission/homework") {
+      if (type === "/modelTrainingCourse/submission/homework" || type === "/modelTrainingCourse/submission/certificate") {
         router.push({ path: type });
       } else {
         notice("warning", "警告", "该页面暂未开放！");

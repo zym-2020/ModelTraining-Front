@@ -1,7 +1,12 @@
 <template>
   <div class="head-main">
     <div class="logo">
-      <img src="/modelTrainingCourse/submission/log/earth.png" alt="" height="50" @click="toNav('/modelTrainingCourse/submission')" />
+      <img
+        src="/modelTrainingCourse/submission/log/earth.png"
+        alt=""
+        height="50"
+        @click="toNav('/modelTrainingCourse/submission')"
+      />
     </div>
     <div class="menu">
       <div
@@ -24,13 +29,16 @@
       </div>
       <div
         :class="active === 4 ? 'menu-item active' : 'menu-item'"
-        @click="toNav('/certificate')"
+        @click="toNav('/modelTrainingCourse/submission/certificate')"
       >
         证书
       </div>
     </div>
     <div class="avatar">
-      <el-avatar src="/modelTrainingCourse/submission/avatar.png" @click="userInfoFlag = true" />
+      <el-avatar
+        src="/modelTrainingCourse/submission/avatar.png"
+        @click="userInfoFlag = true"
+      />
     </div>
   </div>
   <el-dialog v-model="userInfoFlag" title="学员信息" width="400px">
@@ -39,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import UserInfoDialog from "@/components/UserInfoDialog.vue";
 import router from "@/router";
 import { notice } from "@/utils/notice";
@@ -56,10 +64,32 @@ export default defineComponent({
       } else if (type === "/modelTrainingCourse/submission") {
         router.push({ path: type });
         active.value = 0;
+      } else if (type === "/modelTrainingCourse/submission/certificate") {
+        router.push({ path: type });
+        active.value = 4;
       } else {
         notice("warning", "警告", "页面暂未开放");
       }
     };
+
+    watch(
+      () => {
+        return router.currentRoute.value.name;
+      },
+      (newValue) => {
+        if (newValue === "Home") {
+          active.value = 0;
+        } else if (newValue === "Homework") {
+          active.value = 1;
+        } else if (newValue === "Apply") {
+          active.value = 2;
+        } else if (newValue === "Develp") {
+          active.value = 3;
+        } else if (newValue === "Certificate") {
+          active.value = 4;
+        }
+      }
+    );
 
     return {
       active,
