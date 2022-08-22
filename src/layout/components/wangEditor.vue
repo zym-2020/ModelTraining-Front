@@ -29,7 +29,6 @@ export default {
   setup() {
     const route = useRoute();
     const eId = route.query.eId;
-    console.log(eId);
     // 编辑器实例，必须用 shallowRef
     const editorRef = shallowRef();
     let readyWord = "";
