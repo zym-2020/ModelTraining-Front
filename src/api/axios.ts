@@ -25,7 +25,8 @@ axiosInstance.interceptors.response.use(
         }
         setTimeout(() => {
             requestList.delete(response.config.url + response.config.data)
-        }, 600) //请求间隔600ms
+        }, 500) //请求间隔500ms
+
         return response.data
     },
     (err: AxiosResponse) => {
@@ -37,7 +38,7 @@ axiosInstance.interceptors.response.use(
             requestList.delete(err.config.url + err.config.data)
             return err.data
         }
-        
+
     }
 )
 
@@ -47,13 +48,15 @@ axiosInstance.interceptors.request.use(
         config.headers = {
             Authorization: `Bearer ${token}`
         }
-        config.cancelToken = new axios.CancelToken(e => {
-            const cancelRequest = () => {
-                let url: string = config.baseURL as string + config.url
-                e(url)
-            }
-            requestList.has(config.url + JSON.stringify(config.data)) ? cancelRequest() : requestList.add(config.url + JSON.stringify(config.data))
-        })
+        if (config.url != "http://221.226.60.2:8082/data" ) {
+            config.cancelToken = new axios.CancelToken(e => {
+                const cancelRequest = () => {
+                    let url: string = config.baseURL as string + config.url
+                    e(url)
+                }
+                requestList.has(config.url + JSON.stringify(config.data)) ? cancelRequest() : requestList.add(config.url + JSON.stringify(config.data))
+            })
+        }
         return config
     }
 )

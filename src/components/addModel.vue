@@ -1,41 +1,110 @@
 <template>
-  <el-scrollbar height="400px">
+  <el-scrollbar height="600px">
   <h3>基础信息</h3>
-  <el-form ref="ruleFormRef" :model="ModelBaseInfoForm" status-icon label-width="120px" class="demo-ruleForm">
-    <el-form-item label="模型名称">
+  <el-form ref="ruleFormRef" :model="ModelBaseInfoForm" status-icon label-width="120px" class="demo-ruleForm" :rules="rules">
+    <el-form-item label="模型名称" prop="name">
       <el-input v-model="ModelBaseInfoForm.name" placeholder="详细说明该模型的名称"/>
     </el-form-item>
-    <el-form-item label="模型内容">
+    <el-form-item label="模型内容" prop="content">
       <el-input v-model="ModelBaseInfoForm.content" type="textarea" placeholder="详细说明该模型的基本原理" />
     </el-form-item>
-    <el-form-item label="模型描述">
+    <el-form-item label="模型描述" prop="description">
       <el-input v-model="ModelBaseInfoForm.description" type="textarea" placeholder="详细说明该模型的用途"/>
     </el-form-item>
-    <el-form-item label="模型类型">
-      <el-input v-model="ModelBaseInfoForm.type" placeholder="exe/算法/公式/模块/工具"/>
-    </el-form-item>
-    <el-form-item label="模型存储位置">
-      <el-input v-model="ModelBaseInfoForm.storage" placeholder="详细说明获取该模型的原始路径"/>
-    </el-form-item>
-    <el-form-item label="模型版本">
+    <el-form-item label="模型版本" prop="version">
       <el-input v-model="ModelBaseInfoForm.version" placeholder="模型的版本信息"/>
     </el-form-item>
-    <el-form-item label="编程语言">
-      <el-input v-model="ModelBaseInfoForm.language" placeholder="例如：Fortran77, Fortran90, C, C++, Python, Java, IDL, Matlab等" />
+    <el-form-item label="模型类型" prop="type">
+      <el-select style="width:440px" v-model="ModelBaseInfoForm.type" placeholder="模块/服务/代码">
+        <el-option label="模块" value="模块" />
+        <el-option label="服务" value="服务" />
+        <el-option label="代码" value="代码" />
+      </el-select>
+    </el-form-item>
+    <div v-if="ModelBaseInfoForm.type==='模块'">
+      <el-form-item label="软件需求" prop="softDemand">
+        <el-input v-model="ModelBaseInfoForm.softDemand" placeholder="说明该模型所需的软件"/>
+      </el-form-item>
+      <el-form-item label="软件版本" prop="softVersion">
+        <el-input v-model="ModelBaseInfoForm.softVersion" placeholder="需要说明该模型所需的软件版本"/>
+      </el-form-item>
+      <el-form-item label="软件存储位置" prop="storage">
+        <div style="display:flex;width: 440px;"><el-input v-model="ModelBaseInfoForm.storage" placeholder="详细说明获取该模型的原始路径" :readonly="ModelBaseInfoForm.isUpload==='true'"/>
+        <a style="margin-left:10px">或</a><el-button style="margin-left:10px" type="primary" @click="storageUpload">上传</el-button></div>
+      </el-form-item>
+      <h5 style="margin-left: 120px;color:rgb(150,150,150);">说明：直接输入文件的下载链接 或者 通过上传生成下载链接</h5>
+    </div>
+    <div v-if="ModelBaseInfoForm.type==='服务'">
+      <el-form-item label="服务存储位置" prop="serverStorage">
+        <el-input v-model="ModelBaseInfoForm.serverStorage" placeholder="详细说明服务的URL地址" />
+      </el-form-item>
+    </div>
+    <div v-if="ModelBaseInfoForm.type==='代码'">
+      <el-form-item label="涉及公式/算法" >
+          <el-input v-model="ModelBaseInfoForm.algorithm" />
+      </el-form-item>
+      <el-form-item label="代码内容" prop="codeContent">
+        <div style="display:flex;width: 440px;"><el-input v-model="ModelBaseInfoForm.codeContent" type="textarea" placeholder="代码内容" :readonly="ModelBaseInfoForm.isCodeUpload==='true'"/>
+        <a style="margin-left:10px">或</a><el-button style="margin-left:10px" type="primary" @click="codeContentUpload">上传</el-button></div>
+      </el-form-item>
+      <h5 style="margin-left: 120px;color:rgb(150,150,150);">说明：直接输入代码 或者 通过上传生成下载链接</h5>
+      <el-form-item label="编程语言" prop="language">
+        <el-input v-model="ModelBaseInfoForm.language" placeholder="例如：Fortran77, Fortran90, C, C++, Python, Java, IDL, Matlab等" />
+      </el-form-item>
+      <el-form-item label="模型依赖库" prop="dependent">
+        <el-input v-model="ModelBaseInfoForm.dependent" placeholder="部署或运行模型所需要引入的依赖库，例如：Scrapy、Urllib3等" />
+      </el-form-item>
+    </div>
+    <ul>
+      <h4 class="mflex"><el-icon><CaretBottom /></el-icon>模型参考系:</h4>
+      <li style="margin-bottom: 10px">
+        时间参考系：
+      </li>
+    </ul>
+    <el-form-item label="类型" prop="refSystemTime">
+        <el-select  v-model="ModelBaseInfoForm.refSystemTime.type" filterable allow-create placeholder="请选择">
+        <el-option label="UTC" value="UTC" />
+        <el-option label="GMT" value="GMT" />
+        <el-option label="UT" value="UT" />
+        <el-option label="其他(请直接输入)" value=" " disabled/>
+        </el-select>
+     </el-form-item>
+    <el-form-item label="名称" prop="refSystemTime">
+      <el-input  v-model="ModelBaseInfoForm.refSystemTime.name" placeholder="UTC +8、GMT+0"/>
+    </el-form-item>
+    <ul>
+      <li style="margin-bottom: 10px">
+        空间参考系：
+      </li>
+    </ul>       
+    <el-form-item label="类型" prop="refSystemSpace">
+    <el-select v-model="ModelBaseInfoForm.refSystemSpace.type" filterable allow-create placeholder="请选择">
+    <el-option label="地理坐标系" value="地理坐标系" />
+    <el-option label="投影坐标系" value="投影坐标系" />
+    <el-option label="高程参考系" value="高程参考系" />
+    <el-option label="其他(请直接输入)" value=" " disabled/>
+    </el-select>
+    </el-form-item>
+    <el-form-item label="名称" prop="refSystemSpace">
+    <el-input  v-model="ModelBaseInfoForm.refSystemSpace.name" placeholder="WGS 84、Beijing 1954"/>
+    </el-form-item>
+    <el-divider/>
+    <el-form-item label="生产时间" prop="producteTime">
+      <el-input v-model="ModelBaseInfoForm.producteTime"  placeholder="模型构建并发布的时间" />
+    </el-form-item>
+      <el-form-item label="更新时间">
+      <el-input v-model="ModelBaseInfoForm.updateTime"  placeholder="模型后续更新的版本及其时间" />
     </el-form-item>
     <el-form-item label="其他">
       <el-input v-model="ModelBaseInfoForm.other" type="textarea" placeholder="补充内容" />
     </el-form-item>
   </el-form>
     <h3>元数据信息</h3>
-  <el-form ref="ruleFormRef" :model="ModelMetaDataForm" status-icon label-width="120px" class="demo-ruleForm">
-    <el-form-item label="模型假设">
+  <el-form ref="ruleFormRef" :model="ModelMetaDataForm" status-icon label-width="120px" class="demo-ruleForm" :rules="rules">
+    <el-form-item label="模型假设" >
       <el-input v-model="ModelMetaDataForm.hypothesis" placeholder="执行模型所需的假设"/>
     </el-form-item>
-    <el-form-item label="算法/等式">
-      <el-input v-model="ModelMetaDataForm.algorithm" />
-    </el-form-item>
-    <el-form-item label="输入信息" >
+    <el-form-item label="输入信息" prop="modelInputs">
       <el-tag
         type="success"
         v-for="(item, index) in ModelMetaDataForm.modelInputs"
@@ -45,9 +114,9 @@
         @click="inputClick(index)"
         >{{ item.name }}</el-tag
       >
-      <el-button type="success" :icon="Plus" @click="add = true;Flag='addinput'" />
+      <el-button type="success" :icon="Plus" @click="addInput" />
     </el-form-item>
-    <el-form-item label="输出信息" >
+    <el-form-item label="输出信息" prop="modelOutputs">
       <el-tag
         type="success"
         v-for="(item, index) in ModelMetaDataForm.modelOutputs"
@@ -57,9 +126,9 @@
         @click="outputClick(index)"
         >{{ item.name }}</el-tag
       >
-      <el-button type="success" :icon="Plus" @click="add = true;Flag='addoutput'" />
+      <el-button type="success" :icon="Plus" @click="addOutput" />
     </el-form-item>
-    <el-form-item label="参数信息" >
+    <el-form-item label="参数信息" prop="parameters">
       <el-tag
         type="success"
         v-for="(item, index) in ModelMetaDataForm.parameters"
@@ -69,27 +138,31 @@
         @click="paramClick(index)"
         >{{ item.name }}</el-tag
       >
-      <el-button type="success" :icon="Plus" @click="add = true;Flag='addparam'" />
+      <el-button type="success" :icon="Plus" @click="addParam" />
     </el-form-item>
-    <el-form-item label="迭代次数">
-      <el-input v-model="ModelMetaDataForm.iterate" placeholder="说明该模型所需的软件" />
-    </el-form-item>
-    <el-form-item label="软件需求">
-      <el-input v-model="ModelMetaDataForm.demand" placeholder="说明该模型所需的软件"/>
-    </el-form-item>
-    <el-form-item label="软件版本">
-      <el-input v-model="ModelMetaDataForm.version" placeholder="需要说明该模型所需的软件版本"/>
-    </el-form-item>
-    <el-form-item label="软件必要性">
-      <el-select v-model="ModelMetaDataForm.necessity" placeholder="是或否">
-        <el-option label="是" value="是" />
-        <el-option label="否" value="否" />
-      </el-select>
-    </el-form-item>
+    <ul>
+    <h4 class="mflex"><el-icon><CaretBottom /></el-icon>迭代次数:</h4>
+    <li style="margin-bottom: 10px">
+    <div style="display:flex;align-items:center">
+        <div class="text"><div class="necess">*</div>名称</div><el-input v-model="ModelMetaDataForm.iterate.name" />
+    </div>
+    </li>
+    <li style="margin-bottom: 10px">
+      <div style="display:flex;align-items:center">
+      <div  class="text"><div class="necess">*</div>默认值</div><el-input  v-model="ModelMetaDataForm.iterate.defaultValue" />
+      </div>
+    </li>
+      <li>
+        <div style="display:flex;align-items:center">
+          <div  class="text"><div class="necess">*</div>描述</div><el-input v-model="ModelMetaDataForm.iterate.description" />
+        </div>
+      </li>
+    </ul>
+
   </el-form>
     <h3>出处信息</h3>
-  <el-form ref="ruleFormRef" :model="ModelSourceForm" status-icon label-width="120px" class="demo-ruleForm">
-    <el-form-item label="参考文献">
+  <el-form ref="ruleFormRef" :model="ModelSourceForm" status-icon label-width="120px" class="demo-ruleForm" :rules="rules">
+    <el-form-item label="参考文献" prop="references">
         <el-tag
           v-for="tag in ModelSourceForm.references"
           :key="tag"
@@ -113,11 +186,18 @@
           + 添加参考文献
         </el-button>
     </el-form-item>
-    <el-form-item label="出版机构">
-      <el-input v-model="ModelSourceForm.publication" />
+    <h5 style="margin-left: 50px;color:rgb(150,150,150);">建议格式:[1]岳天祥,刘纪远.生态地理建模中的多尺度问题[J].第四纪研究,2003(03):256-261.</h5>
+    <el-form-item label="出版机构" prop="publication">
+      <el-input v-model="ModelSourceForm.publication" placeholder="说明发布该模型的机构"/>
     </el-form-item>
-    <el-form-item label="发展机构">
-      <el-input v-model="ModelSourceForm.develop" />
+    <el-form-item label="发展机构" >
+      <el-input v-model="ModelSourceForm.develop" placeholder="说明更新该模型的机构"/>
+    </el-form-item>
+    <el-form-item label="唯一标识符">
+      <el-input v-model="ModelSourceForm.UId" placeholder="例如：DOI"/>
+    </el-form-item>
+    <el-form-item label="许可证明">
+      <el-input v-model="ModelSourceForm.license" placeholder="例如：OSI-approved licenses:MIT license、Apache License 2.0等"/>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" v-if="modeloperateType==='add'" @click="submitForm">提交</el-button>
@@ -125,22 +205,18 @@
     </el-form-item>
   </el-form>
 </el-scrollbar>
-    <el-dialog v-model="add" width="400px" title="信息添加">
-      <el-form :model="inputForm" label-width="100px">
-        <el-form-item label="输入名称">
+    <el-dialog v-model="add" v-if="add" width="400px" title="信息添加" >
+      <el-form :model="inputForm" label-width="100px" :rules="xrules">
+        <el-form-item label="输入名称" prop="name">
           <el-input v-model="inputForm.name" />
         </el-form-item>
-        <el-form-item label="输入单位">
-          <el-input v-model="inputForm.unit">
-          </el-input>
-        </el-form-item>
-        <el-form-item label="输入描述">
+        <el-form-item label="输入描述" prop="description">
           <el-input v-model="inputForm.description" />
         </el-form-item>
-        <el-form-item label="输入默认值">
+        <el-form-item v-if="Flag!='addoutput' && Flag!='updateoutput'" label="输入默认值" >
           <el-input v-model="inputForm.defaultValue" />
         </el-form-item>
-        <el-form-item label="输入格式">
+        <el-form-item label="输入格式" prop="format">
           <el-input v-model="inputForm.format" />
         </el-form-item>
       </el-form>
@@ -165,15 +241,78 @@
         </span>
       </template>
     </el-dialog>
+    <el-dialog v-model="upload" width="500px" title="模型上传" >
+      <el-form :model="uploadForm" label-width="100px">
+      <el-form-item label="上传文件" prop="file">
+        <el-upload
+          ref="uploadRef"
+          class="upload-demo"
+          :auto-upload="false"
+          :on-change="changeupload"
+          :on-remove="removeupload"
+          :limit="1"
+        >
+          <template #trigger>
+            <el-button type="primary">选择文件</el-button>
+          </template>
+          <template #tip>
+            <div class="el-upload__tip text-red">
+                最多上传一个文件，请勿重复上传，上传状态变更后请及时保存
+            </div>
+        </template>
+          <el-button :disabled="uploadForm.storage!=''" style="margin-left:10px" class="ml-3" type="success" @click="submitUpload">
+            上传
+          </el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item v-if="uploadForm.storage" label="下载地址" prop="storage">
+          <el-input v-model="uploadForm.storage" :disabled="true" type="textarea"/>
+          <el-button style="margin-top:10px" class="ml-3" type="danger" @click="deleteUpload">
+            删除
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog v-model="codeupload" width="500px" title="代码上传" >
+      <el-form :model="codeuploadForm" label-width="100px">
+      <el-form-item label="上传文件" prop="file">
+        <el-upload
+          ref="codeuploadRef"
+          class="upload-demo"
+          :auto-upload="false"
+          :on-change="changecodeupload"
+          :on-remove="removecodeupload"
+          :limit="1"
+        >
+          <template #trigger>
+            <el-button type="primary">选择文件</el-button>
+          </template>
+          <template #tip>
+            <div class="el-upload__tip text-red">
+                最多上传一个文件，请勿重复上传，上传状态变更后请及时保存
+            </div>
+        </template>
+          <el-button :disabled="codeuploadForm.codeContent!=''" style="margin-left:10px" class="ml-3" type="success" @click="submitcodeUpload">
+            上传
+          </el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item v-if="codeuploadForm.codeContent" label="下载地址" prop="storage">
+          <el-input v-model="codeuploadForm.codeContent" :disabled="true" type="textarea"/>
+          <el-button style="margin-top:10px" class="ml-3" type="danger" @click="deletecodeUpload">
+            删除
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, nextTick} from "vue";
-import type { FormInstance, ElInput } from 'element-plus'
+import { defineComponent, ref, reactive, onMounted, nextTick, toRaw} from "vue";
+import type { FormInstance, ElInput, FormRules, UploadInstance } from 'element-plus'
 import { notice } from "@/utils/notice";
 import router from "@/router";
-import { saveModelResources } from "@/api/request";
-import { updateModelResources } from "@/api/request";
+import { deleteData, deleteModelStorage, deleteModelcodeContent, uploadData, updateModelResources, saveModelResources} from "@/api/request";
 import { Plus } from "@element-plus/icons-vue";
 export default defineComponent({
   props: {
@@ -184,12 +323,16 @@ export default defineComponent({
       type: String,
     },
   },
-  emits: ["returnModel","updateModel"],
+  emits: ["returnModel","updateModel","updateModelStorage","updateModelcodeContent"],
   setup(props,context) {
+    const uploadRef =ref([] as any[])
+    const codeuploadRef =ref([] as any[])
     const inputValue = ref('')
     const inputVisible = ref(false)
     const InputRef = ref<InstanceType<typeof ElInput>>()
     const add = ref(false);
+    const upload = ref(false);
+    const codeupload = ref(false);
     const inputUpdateFlag = ref(false);
     const inputIndex = ref(-1);
     const outputUpdateFlag = ref(false);
@@ -197,62 +340,202 @@ export default defineComponent({
     const paramUpdateFlag = ref(false);
     const paramIndex = ref(-1);
     const Flag = ref("");
+    const fileid = ref("")
     const modelResource = reactive({
       modelId:'',
       modelBaseInfo: {
+        isUpload:'false',
+        isCodeUpload:'false',
+        serverStorage:'',
         name: '',
         content: '',
         description: '',
-        type: '',
-        storage: '',
         version: '',
+        type: '',
+        softDemand:'',
+        softVersion:'',
+        storage: '',
+        algorithm:'',
+        codeContent:'',
         language: '',
+        dependent:'',
+        refSystemTime:{
+          type:'',
+          name:'',
+        },
+        refSystemSpace:{
+          type:'',
+          name:'',
+        },
+        producteTime:'',
+        updateTime:'',
         other: ''
       },
       modelMetaData: {
         hypothesis:'',
-        algorithm:'',
-        iterate:'',
-        version:'',
-        necessity:'',
-        demand:'',
         modelInputs: [] as any[],
         modelOutputs: [] as any[],
         parameters:[] as any[],
+        iterate:{
+          name:'',
+          description:'',
+          defaultValue:''
+        }
       },
       modelSource: {
         references:[] as any[],
         publication:'',
-        develop:''
+        develop:'',
+        UId:'',
+        license:''
       }
     })
     const uuid = require('uuid')
     const ModelBaseInfoForm = reactive({
-      name: "",
-      content: "",
-      description: "",
-      type: "",
-      storage: "",
-      version: "",
-      language: "",
-      other: ""
+        name: '',
+        content: '',
+        description: '',
+        version: '',
+        type: '',
+        softDemand:'',
+        softVersion:'',
+        storage: '',
+        serverStorage:'',
+        algorithm:'',
+        codeContent:'',
+        language: '',
+        dependent:'',
+        refSystemTime:{
+          type:'',
+          name:'',
+        },
+        refSystemSpace:{
+          type:'',
+          name:'',
+        },
+        producteTime:'',
+        updateTime:'',
+        other: '',
+        isUpload:'',
+        isCodeUpload:'',
     });
     const ModelMetaDataForm = reactive({
-      modelInputs:[] as any[],
-      modelOutputs:[] as any[],
-      parameters: [] as any[],
-      hypothesis: "",
-      algorithm: "",
-      iterate: "",
-      version: "",
-      necessity: "",
-      demand: ""
+        hypothesis:'',
+        modelInputs: [] as any[],
+        modelOutputs: [] as any[],
+        parameters:[] as any[],
+        iterate:{
+          name:'',
+          description:'',
+          defaultValue:''
+        }
     });
     const ModelSourceForm = reactive({
-      references: [] as any[],
-      publication: "",
-      develop: ""
+        references:[] as any[],
+        publication:'',
+        develop:'',
+        UId:'',
+        license:''
     });
+    const storageUpload = () => {
+      if(ModelBaseInfoForm.isUpload==='true'){
+        uploadForm.storage = ModelBaseInfoForm.storage
+      }
+      else
+        uploadForm.storage = ''
+      upload.value = true
+    }
+    const codeContentUpload = () => {
+      if(ModelBaseInfoForm.isCodeUpload==='true'){
+        codeuploadForm.codeContent = ModelBaseInfoForm.codeContent
+      }
+      else
+        codeuploadForm.codeContent = ''
+      codeupload.value = true
+    }
+    const submitUpload = async () => {
+      let formData = new FormData()
+      uploadForm.name = "模型应用竞赛"
+      formData.append('name', uploadForm.name)
+      formData.append('datafile', uploadRef.value[0])
+      const data = await uploadData(formData);
+      if (data != null && (data as any).code === 1) {
+        notice("success", "成功", "上传成功！");
+        fileid.value = data.data.id
+        ModelBaseInfoForm.isUpload = 'true'
+        ModelBaseInfoForm.storage = 'http://221.226.60.2:8082/data/'+fileid.value
+        uploadForm.storage = 'http://221.226.60.2:8082/data/'+fileid.value
+      }
+    }
+    const deleteUpload = async () => {
+      const data = await deleteData(uploadForm.storage);
+      if (data != null && ((data as any).code === 1||(data as any).message === 'file not exist')) {
+        notice("success", "成功", "删除成功！");
+        ModelBaseInfoForm.isUpload = 'false'
+        uploadForm.storage=''
+        ModelBaseInfoForm.storage=''
+        if((props.modelItem as any).modelId){
+          await deleteModelStorage((router.currentRoute.value.params.apply as any).id, (props.modelItem as any))
+          context.emit("updateModelStorage");
+        }
+      }
+    }
+
+    const changeupload = (file:any,files:any) =>{
+      const temp = [] as any[]
+      for(let item of files){
+        temp.push(item.raw)
+      }
+      uploadRef.value=temp
+    }
+    const removeupload = (file:any,files:any) =>{
+      const temp = [] as any[]
+      for(let item of files){
+        temp.push(item.raw)
+      }
+      uploadRef.value=temp
+    }
+    const submitcodeUpload = async () => {
+      let formData = new FormData()
+      codeuploadForm.name = "模型应用竞赛"
+      formData.append('name', codeuploadForm.name)
+      formData.append('datafile', codeuploadRef.value[0])
+      const data = await uploadData(formData);
+      if (data != null && (data as any).code === 1) {
+        notice("success", "成功", "上传成功！");
+        fileid.value = data.data.id
+        ModelBaseInfoForm.isCodeUpload = 'true'
+        ModelBaseInfoForm.codeContent = 'http://221.226.60.2:8082/data/'+fileid.value
+        codeuploadForm.codeContent = 'http://221.226.60.2:8082/data/'+fileid.value
+      }
+    }
+    const deletecodeUpload = async () => {
+      const data = await deleteData(codeuploadForm.codeContent);
+      if (data != null && (data as any).code === 1) {
+        notice("success", "成功", "删除成功！");
+        ModelBaseInfoForm.isCodeUpload = 'false'
+        codeuploadForm.codeContent=''
+        ModelBaseInfoForm.codeContent=''
+        if((props.modelItem as any).modelId){
+          await deleteModelcodeContent((router.currentRoute.value.params.apply as any).id, (props.modelItem as any))
+          context.emit("updateModelcodeContent");
+        }
+      }
+    }
+    const changecodeupload = (file:any,files:any) =>{
+      const temp = [] as any[]
+      for(let item of files){
+        temp.push(item.raw)
+      }
+      codeuploadRef.value=temp
+    }
+    const removecodeupload = (file:any,files:any) =>{
+      const temp = [] as any[]
+      for(let item of files){
+        temp.push(item.raw)
+      }
+      codeuploadRef.value=temp
+    }
     const handleClose = (tag: string) => {
       ModelSourceForm.references.splice(ModelSourceForm.references.indexOf(tag), 1)
     }
@@ -278,7 +561,52 @@ export default defineComponent({
       defaultValue:"",
       format:"",
     });
+    const uploadForm = reactive({
+      name:"",
+      storage:""
+    })
+    const codeuploadForm = reactive({
+      name:"",
+      codeContent:""
+    })
+    const addInput = () => {
+      inputForm.name = "";
+      inputForm.description = "";
+      inputForm.defaultValue = "";
+      inputForm.format = "";
+      Flag.value = "addinput"
+      add.value = true
+    }
+    const addOutput = () => {
+      inputForm.name = "";
+      inputForm.description = "";
+      inputForm.defaultValue = "";
+      inputForm.format = "";
+      Flag.value = "addoutput"
+      add.value = true
+    }
+    const addParam = () => {
+      inputForm.name = "";
+      inputForm.description = "";
+      inputForm.defaultValue = "";
+      inputForm.format = "";
+      Flag.value = "addparam"
+      add.value = true
+    }
     const addInputClick = () => {
+      if(!inputForm.name){
+        notice("warning", "失败", "“名称”不能为空")
+        return
+      }
+      if(!inputForm.description){
+        notice("warning", "失败", "“描述”不能为空")
+        return
+      }
+
+      if(!inputForm.format){
+        notice("warning", "失败", "“格式”不能为空")
+        return
+      }
       const temp = {
         name: inputForm.name,
         unit: inputForm.unit,
@@ -295,6 +623,19 @@ export default defineComponent({
       add.value = false;
     };
     const updateInputClick = () => {
+      if(!inputForm.name){
+        notice("warning", "失败", "“名称”不能为空")
+        return
+      }
+      if(!inputForm.description){
+        notice("warning", "失败", "“描述”不能为空")
+        return
+      }
+
+      if(!inputForm.format){
+        notice("warning", "失败", "“格式”不能为空")
+        return
+      }
       const temp = {
         name: inputForm.name,
         unit: inputForm.unit,
@@ -311,6 +652,18 @@ export default defineComponent({
       add.value = false;
     };
     const addOutputClick = () => {
+      if(!inputForm.name){
+        notice("warning", "失败", "“名称”不能为空")
+        return
+      }
+      if(!inputForm.description){
+        notice("warning", "失败", "“描述”不能为空")
+        return
+      }
+      if(!inputForm.format){
+        notice("warning", "失败", "“格式”不能为空")
+        return
+      }
       const temp = {
         name: inputForm.name,
         unit: inputForm.unit,
@@ -327,6 +680,18 @@ export default defineComponent({
       add.value = false;
     };
     const updateOutputClick = () => {
+      if(!inputForm.name){
+        notice("warning", "失败", "“名称”不能为空")
+        return
+      }
+      if(!inputForm.description){
+        notice("warning", "失败", "“描述”不能为空")
+        return
+      }
+      if(!inputForm.format){
+        notice("warning", "失败", "“格式”不能为空")
+        return
+      }
       const temp = {
         name: inputForm.name,
         unit: inputForm.unit,
@@ -343,6 +708,19 @@ export default defineComponent({
       add.value = false;
     };
     const addParamClick = () => {
+      if(!inputForm.name){
+        notice("warning", "失败", "“名称”不能为空")
+        return
+      }
+      if(!inputForm.description){
+        notice("warning", "失败", "“描述”不能为空")
+        return
+      }
+
+      if(!inputForm.format){
+        notice("warning", "失败", "“格式”不能为空")
+        return
+      }
       const temp = {
         name: inputForm.name,
         unit: inputForm.unit,
@@ -359,6 +737,19 @@ export default defineComponent({
       add.value = false;
     };
     const updateParamClick = () => {
+      if(!inputForm.name){
+        notice("warning", "失败", "“名称”不能为空")
+        return
+      }
+      if(!inputForm.description){
+        notice("warning", "失败", "“描述”不能为空")
+        return
+      }
+
+      if(!inputForm.format){
+        notice("warning", "失败", "“格式”不能为空")
+        return
+      }
       const temp = {
         name: inputForm.name,
         unit: inputForm.unit,
@@ -415,30 +806,227 @@ export default defineComponent({
       paramIndex.value = index;
       add.value = true;
     };
+
+    const rules = reactive<FormRules>({
+      name: [
+        { required: true, message: '请输入模型名称', trigger: 'change' }
+      ],
+      content: [
+        { required: true, message: '请输入模型内容', trigger: 'change' }
+      ],
+      description: [
+        { required: true, message: '请输入模型描述', trigger: 'change' }
+      ],
+      version: [
+        { required: true, message: '请输入版本信息', trigger: 'change' }
+      ],
+      type: [
+        { required: true, message: '请输入模型类型', trigger: 'change' }
+      ],
+      softVersion: [
+        { required: true, message: '请输入软件版本信息', trigger: 'change' }
+      ],
+      storage: [
+        { required: true, message: '请输入软件存储位置', trigger: 'change' }
+      ],
+      serverStorage:[
+        { required: true, message: '请输入服务存储位置', trigger: 'change' }
+      ],
+      hypothesis: [
+        { required: true, message: '请输入模型假设', trigger: 'change' }
+      ],
+      algorithm: [
+        { required: true, message: '请输入算法/等式', trigger: 'change' }
+      ],
+      modelInputs: [
+        { required: true, message: '请添加输入信息', trigger: 'change' }
+      ],
+      modelOutputs: [
+        { required: true, message: '请添加输出信息', trigger: 'change' }
+      ],
+      softDemand: [
+        { required: true, message: '请输入软件需求', trigger: 'change' }
+      ],
+      necessity: [
+        { required: true, message: '请选择软件必要性', trigger: 'change' }
+      ],
+      dependent: [
+        { required: true, message: '请输入模型依赖库', trigger: 'change' }
+      ],
+      language: [
+        { required: true, message: '请输入编程语言', trigger: 'change' }
+      ],
+      producteTime: [
+        { required: true, message: '请输入生产时间', trigger: 'change' }
+      ],
+      parameters: [
+        { required: true, message: '请添加参数信息', trigger: 'change' }
+      ],
+      references: [
+        { required: true,message: '请添加参考文献', trigger: 'none' }
+      ],
+      publication: [
+        { required: true, message: '请输入出版机构', trigger: 'change' }
+      ],
+      codeContent: [
+        { required: true, message: '请输入代码内容', trigger: 'change' }
+      ],
+      refSystemTime:[
+        { required: true, message: '请输入时间参考系', trigger: 'none' }
+      ],
+      refSystemSpace:[
+        { required: true, message: '请输入空间参考系', trigger: 'none' }
+      ],
+      })
+      const xrules = reactive<FormRules>({
+      name: [
+        { required: true, message: '请输入名称信息', trigger: 'change' }
+      ],
+      description: [
+        { required: true, message: '请输入描述信息', trigger: 'change' }
+      ],
+      format: [
+        { required: true, message: '请输入格式信息', trigger: 'change' }
+      ],
+
+      })
+
     const submitForm = async () => {
+      if(!ModelBaseInfoForm.name){
+        notice("warning", "失败", "“模型名称”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.content){
+        notice("warning", "失败", "“模型内容”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.description){
+        notice("warning", "失败", "“模型描述”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.version){
+        notice("warning", "失败", "“模型版本”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.type){
+        notice("warning", "失败", "“模型类型”不能为空")
+        return
+      }
+      if(ModelBaseInfoForm.type==="模块"){
+        if(!ModelBaseInfoForm.softDemand){
+          notice("warning", "失败", "“软件需求”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.softVersion){
+          notice("warning", "失败", "“软件版本”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.storage){
+          notice("warning", "失败", "“软件存储位置”不能为空")
+          return
+        }
+      }
+      else if(ModelBaseInfoForm.type==="服务"){
+        if(!ModelBaseInfoForm.serverStorage){
+          notice("warning", "失败", "“服务存储位置”不能为空")
+          return
+        }
+      }
+      else if(ModelBaseInfoForm.type==="代码"){
+        if(!ModelBaseInfoForm.codeContent){
+          notice("warning", "失败", "“代码内容”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.language){
+          notice("warning", "失败", "“编程语言”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.dependent){
+          notice("warning", "失败", "“模型依赖库”不能为空")
+          return
+        }
+      }
+      if(!ModelBaseInfoForm.refSystemTime.type){
+        notice("warning", "失败", "“时间参考系类型”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.refSystemTime.name){
+        notice("warning", "失败", "“时间参考系名称”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.refSystemSpace.type){
+        notice("warning", "失败", "“空间参考系类型”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.refSystemSpace.name){
+        notice("warning", "失败", "“空间参考系名称”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.producteTime){
+        notice("warning", "失败", "“生产时间”不能为空")
+        return
+      }
+      if(!(ModelMetaDataForm.modelInputs.length>0)){
+        notice("warning", "失败", "“输入信息”不能为空")
+        return
+      }
+      if(!(ModelMetaDataForm.modelOutputs.length>0)){
+        notice("warning", "失败", "“输出信息”不能为空")
+        return
+      }
+      if(!(ModelMetaDataForm.parameters.length>0)){
+        notice("warning", "失败", "“参数信息”不能为空")
+        return
+      }
+      if(!ModelMetaDataForm.iterate.name){
+        notice("warning", "失败", "“迭代次数名称”不能为空")
+        return
+      }
+      if(!ModelMetaDataForm.iterate.description){
+        notice("warning", "失败", "“迭代次数描述”不能为空")
+        return
+      }
+      if(!(ModelSourceForm.references.length>0)){
+        notice("warning", "失败", "“参考文献”不能为空")
+        return
+      }
+      if(!ModelSourceForm.publication){
+        notice("warning", "失败", "“出版机构”不能为空")
+        return
+      }
+
       modelResource.modelBaseInfo.name = ModelBaseInfoForm.name
       modelResource.modelBaseInfo.content = ModelBaseInfoForm.content
       modelResource.modelBaseInfo.description = ModelBaseInfoForm.description
-      modelResource.modelBaseInfo.type = ModelBaseInfoForm.type
-      modelResource.modelBaseInfo.storage = ModelBaseInfoForm.storage
       modelResource.modelBaseInfo.version = ModelBaseInfoForm.version
+      modelResource.modelBaseInfo.type = ModelBaseInfoForm.type
+      modelResource.modelBaseInfo.softDemand = ModelBaseInfoForm.softDemand
+      modelResource.modelBaseInfo.softVersion = ModelBaseInfoForm.softVersion
+      modelResource.modelBaseInfo.storage = ModelBaseInfoForm.storage 
+      modelResource.modelBaseInfo.serverStorage = ModelBaseInfoForm.serverStorage
+      modelResource.modelBaseInfo.algorithm = ModelBaseInfoForm.algorithm
+      modelResource.modelBaseInfo.codeContent = ModelBaseInfoForm.codeContent
       modelResource.modelBaseInfo.language = ModelBaseInfoForm.language
+      modelResource.modelBaseInfo.dependent = ModelBaseInfoForm.dependent
+      modelResource.modelBaseInfo.refSystemTime = ModelBaseInfoForm.refSystemTime
+      modelResource.modelBaseInfo.refSystemSpace = ModelBaseInfoForm.refSystemSpace
+      modelResource.modelBaseInfo.producteTime = ModelBaseInfoForm.producteTime
+      modelResource.modelBaseInfo.updateTime = ModelBaseInfoForm.updateTime
       modelResource.modelBaseInfo.other = ModelBaseInfoForm.other
+      modelResource.modelBaseInfo.isUpload = ModelBaseInfoForm.isUpload
+      modelResource.modelBaseInfo.isCodeUpload = ModelBaseInfoForm.isCodeUpload
 
       modelResource.modelMetaData.hypothesis = ModelMetaDataForm.hypothesis
-      modelResource.modelMetaData.algorithm = ModelMetaDataForm.algorithm
       modelResource.modelMetaData.parameters = ModelMetaDataForm.parameters
       modelResource.modelMetaData.iterate = ModelMetaDataForm.iterate
-      modelResource.modelMetaData.version = ModelMetaDataForm.version
-      modelResource.modelMetaData.version = ModelMetaDataForm.version
-      modelResource.modelMetaData.necessity = ModelMetaDataForm.necessity
       modelResource.modelMetaData.modelInputs = ModelMetaDataForm.modelInputs
       modelResource.modelMetaData.modelOutputs = ModelMetaDataForm.modelOutputs
-      modelResource.modelMetaData.demand = ModelMetaDataForm.demand
-
+      
       modelResource.modelSource.references = ModelSourceForm.references
       modelResource.modelSource.publication = ModelSourceForm.publication
       modelResource.modelSource.develop = ModelSourceForm.develop
+      modelResource.modelSource.UId = ModelSourceForm.UId
+      modelResource.modelSource.license = ModelSourceForm.license
       
       modelResource.modelId = uuid.v4()
       const data = await saveModelResources(
@@ -451,31 +1039,141 @@ export default defineComponent({
       }
     }
     const submitUpdate = async () => {
+      if(!ModelBaseInfoForm.name){
+        notice("warning", "失败", "“模型名称”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.content){
+        notice("warning", "失败", "“模型内容”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.description){
+        notice("warning", "失败", "“模型描述”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.version){
+        notice("warning", "失败", "“模型版本”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.type){
+        notice("warning", "失败", "“模型类型”不能为空")
+        return
+      }
+      if(ModelBaseInfoForm.type==="模块"){
+        if(!ModelBaseInfoForm.softDemand){
+          notice("warning", "失败", "“软件需求”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.softVersion){
+          notice("warning", "失败", "“软件版本”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.storage){
+          notice("warning", "失败", "“软件存储位置”不能为空")
+          return
+        }
+      }
+      else if(ModelBaseInfoForm.type==="服务"){
+        if(!ModelBaseInfoForm.serverStorage){
+          notice("warning", "失败", "“服务存储位置”不能为空")
+          return
+        }
+      }
+      else if(ModelBaseInfoForm.type==="代码"){
+        if(!ModelBaseInfoForm.codeContent){
+          notice("warning", "失败", "“代码内容”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.language){
+          notice("warning", "失败", "“编程语言”不能为空")
+          return
+        }
+        if(!ModelBaseInfoForm.dependent){
+          notice("warning", "失败", "“模型依赖库”不能为空")
+          return
+        }
+      }
+      if(!ModelBaseInfoForm.refSystemTime.type){
+        notice("warning", "失败", "“时间参考系类型”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.refSystemTime.name){
+        notice("warning", "失败", "“时间参考系名称”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.refSystemSpace.type){
+        notice("warning", "失败", "“空间参考系类型”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.refSystemSpace.name){
+        notice("warning", "失败", "“空间参考系名称”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.producteTime){
+        notice("warning", "失败", "“生产时间”不能为空")
+        return
+      }
+      if(!(ModelMetaDataForm.modelInputs.length>0)){
+        notice("warning", "失败", "“输入信息”不能为空")
+        return
+      }
+      if(!(ModelMetaDataForm.modelOutputs.length>0)){
+        notice("warning", "失败", "“输出信息”不能为空")
+        return
+      }
+      if(!(ModelMetaDataForm.parameters.length>0)){
+        notice("warning", "失败", "“输出信息”不能为空")
+        return
+      }
+      if(!ModelMetaDataForm.iterate.name){
+        notice("warning", "失败", "“迭代次数名称”不能为空")
+        return
+      }
+      if(!ModelMetaDataForm.iterate.description){
+        notice("warning", "失败", "“迭代次数描述”不能为空")
+        return
+      }
+      if(!(ModelSourceForm.references.length>0)){
+        notice("warning", "失败", "“参考文献”不能为空")
+        return
+      }
+      if(!ModelSourceForm.publication){
+        notice("warning", "失败", "“出版机构”不能为空")
+        return
+      }
       modelResource.modelBaseInfo.name = ModelBaseInfoForm.name
       modelResource.modelBaseInfo.content = ModelBaseInfoForm.content
       modelResource.modelBaseInfo.description = ModelBaseInfoForm.description
-      modelResource.modelBaseInfo.type = ModelBaseInfoForm.type
-      modelResource.modelBaseInfo.storage = ModelBaseInfoForm.storage
       modelResource.modelBaseInfo.version = ModelBaseInfoForm.version
+      modelResource.modelBaseInfo.type = ModelBaseInfoForm.type
+      modelResource.modelBaseInfo.softDemand = ModelBaseInfoForm.softDemand
+      modelResource.modelBaseInfo.softVersion = ModelBaseInfoForm.softVersion
+      modelResource.modelBaseInfo.storage = ModelBaseInfoForm.storage
+      modelResource.modelBaseInfo.serverStorage = ModelBaseInfoForm.serverStorage
+      modelResource.modelBaseInfo.algorithm = ModelBaseInfoForm.algorithm
+      modelResource.modelBaseInfo.codeContent = ModelBaseInfoForm.codeContent
       modelResource.modelBaseInfo.language = ModelBaseInfoForm.language
+      modelResource.modelBaseInfo.dependent = ModelBaseInfoForm.dependent
+      modelResource.modelBaseInfo.refSystemTime = ModelBaseInfoForm.refSystemTime
+      modelResource.modelBaseInfo.refSystemSpace = ModelBaseInfoForm.refSystemSpace
+      modelResource.modelBaseInfo.producteTime = ModelBaseInfoForm.producteTime
+      modelResource.modelBaseInfo.updateTime = ModelBaseInfoForm.updateTime
       modelResource.modelBaseInfo.other = ModelBaseInfoForm.other
+      modelResource.modelBaseInfo.isUpload = ModelBaseInfoForm.isUpload
+      modelResource.modelBaseInfo.isCodeUpload = ModelBaseInfoForm.isCodeUpload
 
       modelResource.modelMetaData.hypothesis = ModelMetaDataForm.hypothesis
-      modelResource.modelMetaData.algorithm = ModelMetaDataForm.algorithm
       modelResource.modelMetaData.parameters = ModelMetaDataForm.parameters
       modelResource.modelMetaData.iterate = ModelMetaDataForm.iterate
-      modelResource.modelMetaData.version = ModelMetaDataForm.version
-      modelResource.modelMetaData.version = ModelMetaDataForm.version
-      modelResource.modelMetaData.necessity = ModelMetaDataForm.necessity
       modelResource.modelMetaData.modelInputs = ModelMetaDataForm.modelInputs
       modelResource.modelMetaData.modelOutputs = ModelMetaDataForm.modelOutputs
-      modelResource.modelMetaData.demand = ModelMetaDataForm.demand
       
       modelResource.modelSource.references = ModelSourceForm.references
       modelResource.modelSource.publication = ModelSourceForm.publication
       modelResource.modelSource.develop = ModelSourceForm.develop
+      modelResource.modelSource.UId = ModelSourceForm.UId
+      modelResource.modelSource.license = ModelSourceForm.license
       modelResource.modelId = (props.modelItem as any).modelId
-      console.log(modelResource)
       const data = await updateModelResources(
         (router.currentRoute.value.params.apply as any).id,
         modelResource
@@ -486,30 +1184,40 @@ export default defineComponent({
       }
     }
     onMounted(() => {
-      if((props.modelItem as any) !='{}')
+      if((props.modelItem as any) !='')
       {
         ModelBaseInfoForm.name = (props.modelItem as any).modelBaseInfo.name,
         ModelBaseInfoForm.content = (props.modelItem as any).modelBaseInfo.content,
         ModelBaseInfoForm.description = (props.modelItem as any).modelBaseInfo.description,
-        ModelBaseInfoForm.type = (props.modelItem as any).modelBaseInfo.type,
-        ModelBaseInfoForm.storage = (props.modelItem as any).modelBaseInfo.storage,
         ModelBaseInfoForm.version = (props.modelItem as any).modelBaseInfo.version,
+        ModelBaseInfoForm.type = (props.modelItem as any).modelBaseInfo.type,
+        ModelBaseInfoForm.softDemand = (props.modelItem as any).modelBaseInfo.softDemand,
+        ModelBaseInfoForm.softVersion = (props.modelItem as any).modelBaseInfo.softVersion,
+        ModelBaseInfoForm.storage = (props.modelItem as any).modelBaseInfo.storage,
+        ModelBaseInfoForm.serverStorage = (props.modelItem as any).modelBaseInfo.serverStorage,
+        ModelBaseInfoForm.algorithm = (props.modelItem as any).modelBaseInfo.algorithm,
+        ModelBaseInfoForm.codeContent = (props.modelItem as any).modelBaseInfo.codeContent,
         ModelBaseInfoForm.language = (props.modelItem as any).modelBaseInfo.language,
+        ModelBaseInfoForm.dependent = (props.modelItem as any).modelBaseInfo.dependent,
+        ModelBaseInfoForm.refSystemTime = (props.modelItem as any).modelBaseInfo.refSystemTime,
+        ModelBaseInfoForm.refSystemSpace = (props.modelItem as any).modelBaseInfo.refSystemSpace,
+        ModelBaseInfoForm.producteTime = (props.modelItem as any).modelBaseInfo.producteTime,
+        ModelBaseInfoForm.updateTime = (props.modelItem as any).modelBaseInfo.updateTime,
         ModelBaseInfoForm.other = (props.modelItem as any).modelBaseInfo.other,
+        ModelBaseInfoForm.isUpload = (props.modelItem as any).modelBaseInfo.isUpload,
+        ModelBaseInfoForm.isCodeUpload = (props.modelItem as any).modelBaseInfo.isCodeUpload,
 
         ModelMetaDataForm.hypothesis = (props.modelItem as any).modelMetaData.hypothesis,
-        ModelMetaDataForm.algorithm = (props.modelItem as any).modelMetaData.algorithm,
         ModelMetaDataForm.iterate = (props.modelItem as any).modelMetaData.iterate,
-        ModelMetaDataForm.version = (props.modelItem as any).modelMetaData.version,
-        ModelMetaDataForm.necessity = (props.modelItem as any).modelMetaData.necessity,
-        ModelMetaDataForm.demand = (props.modelItem as any).modelMetaData.demand,
         ModelMetaDataForm.modelInputs = (props.modelItem as any).modelMetaData.modelInputs,
         ModelMetaDataForm.modelOutputs = (props.modelItem as any).modelMetaData.modelOutputs,
         ModelMetaDataForm.parameters = (props.modelItem as any).modelMetaData.parameters,
 
         ModelSourceForm.references = (props.modelItem as any).modelSource.references,
         ModelSourceForm.publication = (props.modelItem as any).modelSource.publication,
-        ModelSourceForm.develop = (props.modelItem as any).modelSource.develop
+        ModelSourceForm.develop = (props.modelItem as any).modelSource.develop,
+        ModelSourceForm.UId = (props.modelItem as any).modelSource.UId,
+        ModelSourceForm.license = (props.modelItem as any).modelSource.license
     }
     })
     
@@ -530,12 +1238,16 @@ export default defineComponent({
       uuid,
       inputForm,
       add,
+      upload,
       inputUpdateFlag,
       inputIndex,
       outputUpdateFlag,
       outputIndex,
       paramUpdateFlag,
       paramIndex,
+      addInput,
+      addOutput,
+      addParam,
       addInputClick,
       updateInputClick,
       addOutputClick,
@@ -548,10 +1260,44 @@ export default defineComponent({
       InputRef,
       handleClose,
       showInput,
-      handleInputConfirm
+      handleInputConfirm,
+      rules,
+      xrules,
+      storageUpload,
+      codeContentUpload,
+      submitUpload,
+      uploadForm,
+      changeupload,
+      removeupload,
+      deleteUpload,
+      submitcodeUpload,
+      codeuploadForm,
+      changecodeupload,
+      removecodeupload,
+      deletecodeUpload,
+      fileid,
+      codeupload
     }
 
   }
 
 });
 </script>
+<style lang="scss" scoped>
+.el-tag{
+  margin-right: 5px;
+}
+.mflex{
+display: flex;
+}
+.necess{
+  margin-right: 5px;
+  color:lightcoral;
+}
+.text{
+  display: flex;
+  width: 80px;
+  justify-content: flex-end;
+  margin-right: 10px;
+}
+</style>

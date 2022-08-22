@@ -6,7 +6,11 @@ export const step1 = {
     references: [],
     description: '对数据进行重新审查和校验的过程，目的在于删除重复信息、纠正存在的错误，并提供数据一致性。 数据清洗从名字上也看的出就是把"脏"的"洗掉"，指发现并纠正数据文件中可识别的错误的最后一道程序，包括检查数据一致性，处理无效值和缺失值等。',
     pictures: [],
-    modelResources:[        
+    video:{
+        name:'说明视频.mp4',
+        id:'-1'
+    },
+    modelResource:      
         {
         modelBaseInfo:{
             name: "K-means聚类模型",
@@ -16,28 +20,38 @@ export const step1 = {
             modelInputs: [
                 {
                     name: 'K值',
-                    description: "簇数"
+                    description: "簇数",
+                    dataResource:{
+                        dataBaseInfo:{
+                            name: "模型参数",
+                            description: "K值为默认值",
+                        }
+                    },
                 },
                 {
                     name: "x, y",
-                    description: "初始中心点位置"
+                    description: "初始中心点位置",
+                    dataResource:{
+                        dataBaseInfo:{
+                            name: "位置数据",
+                            description: "人口分布位置",
+                        }
+                    },
                 },
                 {
                     name: "样本",
-                    description: "用于聚类的数据"
+                    description: "用于聚类的数据",
+                    dataResource:{
+                        dataBaseInfo:{
+                            name: "人口数据",
+                            description: "2010-2020年中国各省人口数据",
+                        }
+                    },
                 }
             ],
             modelOutputs: [],
             parameters:[]
         },
-    }
+    },
 
-    ],
-    dataResources:[        
-        {
-        dataBaseInfo:{
-            name: "人口数据",
-            description: "2010-2020年中国各省人口数据",
-        }
-    }],
 }
