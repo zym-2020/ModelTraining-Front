@@ -122,6 +122,12 @@ export async function updateModelResources(id: string, jsonData: any) {
 export async function updateDataResources(id: string, jsonData: any) {
     return await patch(`/apply/updateDataResources/${id}`, jsonData)
 }
+
+
+//certificate相关接口
+export async function getAddress() {
+    return await get(`/certificate/getAddress`)
+}
 export async function addResearcher(id: string, jsonData: any) {
     return await patch(`/apply/addResearcher/${id}`, jsonData)
 }
@@ -221,8 +227,4 @@ export async function deleteresultValidationStorage(id: string) {
 }
 export async function deleteresultVisualizationStorage(id: string) {
     return await post(`/apply/deleteresultVisualizationStorage/${id}`)
-}
-//homework
-export async function checkState(key: string) {
-    return await get(`/homework/checkState/${key}`)
 }
