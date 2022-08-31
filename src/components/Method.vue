@@ -1,7 +1,7 @@
 <template>
   <div class="method">
     <div class="title">
-      <h2>2 实验方法</h2>
+      <h2>2 实验流程</h2><h3>（具体的研究过程）</h3>
     </div>
     <el-divider style="width: 1000px;"/>
     <div class="resource">
@@ -472,7 +472,10 @@ export default defineComponent({
 .method {
   width: 1000px;
   padding-left: 20px;
-
+  .title{
+    display: flex;
+    align-items: flex-end;
+  }
   .small-title {
     display: flex;
 

@@ -73,11 +73,15 @@ export async function download(number: string, name: string) {
 export async function getByTeamId() {
     return await get(`/apply/getByTeamId`)
 }
-
+export async function getById() {
+    return await patch(`/apply/getById`)
+}
 export async function saveDescription(id: string, jsonData: any) {
     return await patch(`/apply/saveDescription/${id}`, jsonData)
 }
-
+export async function saveTopic(id: string, jsonData: any) {
+    return await patch(`/apply/saveTopic/${id}`, jsonData)
+}
 export async function saveProcess(id: string, jsonData: any) {
     return await patch(`/apply/saveProcess/${id}`, jsonData)
 }
@@ -121,12 +125,6 @@ export async function updateModelResources(id: string, jsonData: any) {
 }
 export async function updateDataResources(id: string, jsonData: any) {
     return await patch(`/apply/updateDataResources/${id}`, jsonData)
-}
-
-
-//certificate相关接口
-export async function getAddress() {
-    return await get(`/certificate/getAddress`)
 }
 export async function addResearcher(id: string, jsonData: any) {
     return await patch(`/apply/addResearcher/${id}`, jsonData)
@@ -203,13 +201,18 @@ export async function mergeConclusionVideoFiles(id: string, jsonData: { uuid: st
 export async function removeConclusionVideoFile(id: string) {
     return await del(`/apply/removeConclusionFile/${id}`)
 }
-export async function mergeProcessVideoFiles(id: string,  jsonData: {  process: any; uuid: string; name: string; total: number }) {
+export async function mergeProcessVideoFiles(id: string,  jsonData: {  uuid: string; name: string; total: number }) {
     return await post(`/apply/mergeProcessFiles/${id}`, jsonData)
 }
 
 export async function removeProcessVideoFile(id: string, jsonData: any) {
     return await del(`/apply/removeProcessFile/${id}`, jsonData)
 }
+
+export async function removeTempVideoFile(id: string, jsonData: any) {
+    return await del(`/apply/removeTempVideoFile/${id}`, jsonData)
+}
+
 export async function getProcessLength(id: string) {
     return await get(`/apply/getProcessLength/${id}`)
 }
@@ -227,4 +230,9 @@ export async function deleteresultValidationStorage(id: string) {
 }
 export async function deleteresultVisualizationStorage(id: string) {
     return await post(`/apply/deleteresultVisualizationStorage/${id}`)
+}
+
+//certificate相关接口
+export async function getAddress() {
+    return await get(`/certificate/getAddress`)
 }

@@ -4,7 +4,7 @@
       <el-col :span="18" :offset="3">
         <div class="body">
           <div class="left">
-            <div class="title">模型应用竞赛</div>
+            <div class="title">模型应用/开发竞赛</div>
             <el-menu default-active="1" @select="selectHandle">
               <el-menu-item index="1">
                 <el-icon>
@@ -19,8 +19,8 @@
                   </el-icon>
                   <span>文档</span>
                 </template>
-                <el-menu-item index="2-1" @click="goAnchor('#anchor-1')">实验描述</el-menu-item>
-                <el-menu-item index="2-2" @click="goAnchor('#anchor-2')">实验方法</el-menu-item>
+                <el-menu-item index="2-1" @click="goAnchor('#anchor-1')">实验介绍</el-menu-item>
+                <el-menu-item index="2-2" @click="goAnchor('#anchor-2')">实验流程</el-menu-item>
                 <el-menu-item index="2-3" @click="goAnchor('#anchor-3')">实验结果</el-menu-item>
               </el-sub-menu>
               <el-menu-item index="3">
@@ -34,7 +34,7 @@
           <div class="right">
             <team v-if="active == 'team'" :researcherValue="researcherValue" />
             <apply-home v-if="active == 'commit'" :summaryValue="summaryValue" :researcherValue="researcherValue"
-              :descriptionValue="descriptionValue" :methodValue="methodValue" :resultValue="resultValue" />
+              :descriptionValue="descriptionValue" :methodValue="methodValue" :resultValue="resultValue" :topicValue="topicValue" @returnTopic="returnTopic"/>
             <div v-if="active == 'document'">
               <div id="anchor-1">
                 <description :descriptionValue="descriptionValue" @rerturnDescription="rerturnDescription" />
@@ -82,6 +82,7 @@ export default defineComponent({
     const resultValue = ref<any>((router.currentRoute.value.params.apply as any).result)
     const researcherValue = ref<any>((router.currentRoute.value.params.apply as any).researcher)
     const summaryValue = ref<any>((router.currentRoute.value.params.apply as any).summary)
+    const topicValue = ref<any>((router.currentRoute.value.params.apply as any).topic)
     const descriptionTemp = reactive({
       background: {
         text: '',
@@ -262,7 +263,10 @@ export default defineComponent({
         notice("warning", "失败", "1.3 空间尺度的维度不能为空")
         return
       }
-
+      if (summaryItem.description.scheme.space.unit == '') {
+        notice("warning", "失败", "1.3 空间尺度的参考系不能为空")
+        return
+      }
       if (summaryItem.description.scheme.method == '') {
         notice("warning", "失败", "1.3 研究方法不能为空")
         return
@@ -329,9 +333,11 @@ export default defineComponent({
     const rerturnResult = (val: any) => {
       resultValue.value = val
     }
-
+    const returnTopic = (val: any) => {
+      topicValue.value = val
+    }
     onMounted(() => {
-
+      
     })
 
 
@@ -350,7 +356,9 @@ export default defineComponent({
       addTabF,
       resultTemp,
       descriptionTemp,
-      methodTemp
+      methodTemp,
+      topicValue,
+      returnTopic
     };
   },
 });
@@ -367,7 +375,7 @@ export default defineComponent({
       position: fixed;
       border-radius: 6px;
       min-width: 200px;
-      height: 420px;
+      min-height: 45%;
       box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.35);
 
       .title {

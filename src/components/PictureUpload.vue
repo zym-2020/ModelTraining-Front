@@ -15,7 +15,7 @@
     </el-upload> -->
   <el-upload
       v-model:file-list="fileList"
-      action="http://:8888/upload/uploadImg"
+      action="https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/upload/uploadImg"
       :on-preview="handlePictureCardPreview"
       :on-remove="handleRemove"
       :before-upload="handleBeforeUpload"
@@ -109,7 +109,7 @@ export default defineComponent({
         props.pictureList.forEach((item) => {
           fileList.value.push({
             name: item as string,
-            url: "http://172.21.213.216:8888/upload/getImg/" + item,
+            url: "https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/upload/getImg/" + item,
           });
         });
       }

@@ -4,27 +4,33 @@
       <h3>1.1 实验背景</h3>
       <p class="light-gray">{{summaryItem.description.background.text}}</p>
       <div v-if="summaryItem.description.background.pictures.length>0">
-      <img style="margin-right:10px;width:150px;height:150px" v-for="item in summaryItem.description.background.pictures" :src="'http://172.21.213.216:8888/upload/getImg/'+item"/>
+      <PicturesDownload :fileList="summaryItem.description.background.pictures" fileName="实验背景"></PicturesDownload>
       </div>
       <div style="display: flex;align-items:flex-end;">
-        <div v-if="summaryItem.description.background.video && summaryItem.description.background.video.id!=''">已上传视频：<el-tag>{{summaryItem.description.background.video.name}}</el-tag></div>
+        <div v-if="summaryItem.description.background.video && summaryItem.description.background.video.id!=''">
+        已上传视频：<el-tag>{{summaryItem.description.background.video.name}}</el-tag>
+        <el-button @click="downloadVideo(summaryItem.description.background.video)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
+        </div>
       </div>
       <h3>1.2 实验问题</h3>
       <p class="light-gray">{{summaryItem.description.purpose.text}}</p>
-      <div v-if="summaryItem.description.purpose.pictures.length>0">
-      <img style="margin-right:10px;width:150px;height:150px" v-for="item in summaryItem.description.purpose.pictures" :src="'http://172.21.213.216:8888/upload/getImg/'+item"/>
+            <div v-if="summaryItem.description.purpose.pictures.length>0">
+      <PicturesDownload :fileList="summaryItem.description.purpose.pictures" fileName="实验问题"></PicturesDownload>
       </div>
       <div style="display: flex;align-items:flex-end;">
-        <div v-if="summaryItem.description.purpose.video && summaryItem.description.purpose.video.id!=''">已上传视频：<el-tag>{{summaryItem.description.purpose.video.name}}</el-tag></div>
+        <div v-if="summaryItem.description.purpose.video && summaryItem.description.purpose.video.id!=''">
+        已上传视频：<el-tag>{{summaryItem.description.purpose.video.name}}</el-tag>
+        <el-button @click="downloadVideo(summaryItem.description.purpose.video)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
+        </div>
       </div>
       <h3>1.3 问题分析及设计</h3>
-      <h4>(1) 研究目的</h4>
-      <p class="light-gray">{{summaryItem.description.scheme.purpose}}</p>
-      <h4>(2) 研究对象</h4>
+      <h4>(1) 研究对象</h4>
       <p class="light-gray">{{summaryItem.description.scheme.target}}</p>
+      <h4>(2) 研究目的</h4>
+      <p class="light-gray">{{summaryItem.description.scheme.purpose}}</p>
       <h4>(3) 研究时空尺度</h4>
       <div class="light-gray">
-          <b>时间尺度：</b><br>
+          <b>研究时间维度：</b><br>
           <ul>
             <li>
               分辨率：{{summaryItem.description.scheme.time.resolution}}
@@ -38,13 +44,10 @@
             <li v-if="summaryItem.description.scheme.time.length">
               步长：{{summaryItem.description.scheme.time.length}}
             </li>
-            <li v-if="summaryItem.description.scheme.time.unit">
-              单位：{{summaryItem.description.scheme.time.unit}}
-            </li>
           </ul>
       </div>
       <div class="light-gray">
-          <b>空间尺度：</b><br>
+          <b>研究空间维度：</b><br>
           <ul>
             <li>
               分辨率：{{summaryItem.description.scheme.space.resolution}}
@@ -56,10 +59,10 @@
               范围：{{summaryItem.description.scheme.space.scope}}
             </li>
             <li>
-              维度：{{summaryItem.description.scheme.space.length}}
+              维度：{{summaryItem.description.scheme.space.dimension}}
             </li>
             <li v-if="summaryItem.description.scheme.space.unit">
-              单位：{{summaryItem.description.scheme.space.unit}}
+              参考系：{{summaryItem.description.scheme.space.unit}}
             </li>
           </ul>
       </div>
@@ -67,10 +70,13 @@
       <h4>(4) 研究方法</h4>
       <p class="light-gray">{{summaryItem.description.scheme.method}}</p>
       <div v-if="summaryItem.description.scheme.pictures.length>0">
-      <img style="margin-right:10px;width:150px;height:150px" v-for="item in summaryItem.description.scheme.pictures" :src="'http://172.21.213.216:8888/upload/getImg/'+item"/>
+      <PicturesDownload :fileList="summaryItem.description.scheme.pictures" fileName="问题分析及设计"></PicturesDownload>
       </div>
       <div style="display: flex;align-items:flex-end;">
-        <div v-if="summaryItem.description.scheme.video && summaryItem.description.scheme.video.id!=''">已上传视频：<el-tag>{{summaryItem.description.scheme.video.name}}</el-tag></div>
+        <div v-if="summaryItem.description.scheme.video && summaryItem.description.scheme.video.id">
+        已上传视频：<el-tag>{{summaryItem.description.scheme.video.name}}</el-tag>
+        <el-button @click="downloadVideo(summaryItem.description.scheme.video)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
+        </div>
       </div>
      <h3  v-if="summaryItem.researcher.persons.length>0">1.4 研究人员</h3>
       <ul v-if="summaryItem.researcher.persons.length>0">
@@ -87,7 +93,7 @@
         </li>
       </ul>
       </div>
-      <h1>2 实验方法</h1>
+      <h1>2 实验流程</h1>
       <h3>2.1 研究资源</h3>
       <div v-if="summaryItem.method.resource.modelResources.length>0">
       <h4>(1) 模型资源</h4>
@@ -146,7 +152,13 @@
                       空间参考系类型：{{item.modelBaseInfo.refSystemSpace.type}}；名称：{{item.modelBaseInfo.refSystemSpace.name}}
                     </li>
                     <li>
-                      生产时间：{{item.modelBaseInfo.producteTime}}
+                      发布时间：{{item.modelBaseInfo.producteTime}}
+                    </li>
+                    <li v-if="item.modelBaseInfo.hypothesis">
+                      模型假设：{{item.modelBaseInfo.hypothesis}}
+                    </li>
+                    <li v-if="item.modelBaseInfo.application">
+                      模型适用范围：{{item.modelBaseInfo.application}}
                     </li>
                     <li v-if="item.modelBaseInfo.updateTime">
                       更新时间：{{item.modelBaseInfo.updateTime}}
@@ -159,11 +171,8 @@
                 </li>
                 <li>
                   <el-card class="card2">
-                  <b>元数据信息：</b>
+                  <b>运行信息：</b>
                   <ul class="light-gray">
-                  <li v-if="item.modelMetaData.hypothesis">
-                    模型假设：{{item.modelMetaData.hypothesis}}
-                  </li>
                   <li v-if="item.modelMetaData.modelInputs.length>0">
                     输入信息：
                     <ol>
@@ -191,9 +200,11 @@
                       </li>
                     </ol>
                   </li>
-                  <li v-if="item.modelMetaData.iterate">
-                    迭代次数名称：{{item.modelMetaData.iterate.name}}<br>
-                    <a>描述：{{item.modelMetaData.iterate.description}}</a><a>默认值：{{item.modelMetaData.iterate.name.defaultValue}}</a>
+                  <li v-if="item.modelMetaData.upperboundary">
+                    模型运行上边界条件：{{item.modelMetaData.upperboundary}}
+                  </li>
+                  <li v-if="item.modelMetaData.lowerboundary">
+                    模型运行下边界条件：{{item.modelMetaData.lowerboundary}}
                   </li>
                   </ul>
                   </el-card>
@@ -254,19 +265,19 @@
                   <li v-if="item.dataBaseInfo.location!=''">
                     存储位置：{{item.dataBaseInfo.location}}
                   </li>
-                  <li>
+                  <li v-if="item.dataBaseInfo.format">
                     数据格式：{{item.dataBaseInfo.format}}
                   </li>
+                  </div>
                   <li v-if="item.dataBaseInfo.version">
                     数据版本：{{item.dataBaseInfo.version}}
                   </li>
                   <li v-if="item.dataBaseInfo.produceTime">
-                    生产时间：{{item.dataBaseInfo.produceTime}}
+                    发布时间：{{item.dataBaseInfo.produceTime}}
                   </li>
                   <li v-if="item.dataBaseInfo.updateTime">
                     更新时间：{{item.dataBaseInfo.updateTime}}
                   </li>
-                  </div>
                   <li>
                     研究时空尺度
                     <div class="light-gray">
@@ -283,9 +294,6 @@
                           </li>
                           <li v-if="item.dataBaseInfo.time.length">
                             步长：{{item.dataBaseInfo.time.length}}
-                          </li>
-                          <li v-if="item.dataBaseInfo.time.unit">
-                            单位：{{item.dataBaseInfo.time.unit}}
                           </li>
                         </ul>
                     </div>
@@ -305,7 +313,7 @@
                             维度：{{item.dataBaseInfo.space.length}}
                           </li>
                           <li v-if="item.dataBaseInfo.space.unit">
-                            单位：{{item.dataBaseInfo.space.unit}}
+                            参考系：{{item.dataBaseInfo.space.unit}}
                           </li>
                         </ul>
                     </div>
@@ -315,20 +323,20 @@
               </li>
               <li>
                 <el-card class="card2">
-                <b>活动信息：</b>
+                <b>数据预处理信息：</b>
                 <ul class="light-gray">
-                <li v-if="item.dataActive.handleName!=''|| item.dataActive.handleDescription!=''">
-                  数据处理步骤名称：{{item.dataActive.handleName}}，描述：{{item.dataActive.handleDescription}}
+                <li v-if="item.dataActive.handleName!=''">
+                  数据处理步骤名称：{{item.dataActive.handleName}}
                 </li>
-                <li v-if="item.dataActive.conversionName!=''||item.dataActive.conversionDescription!=''">
-                  数据转化步骤名称：{{item.dataActive.conversionName}}，描述：{{item.dataActive.conversionDescription}}
+                <li v-if="item.dataActive.handleDescription!=''">
+                  描述：{{item.dataActive.handleDescription}}
                 </li>
                 </ul>
                 </el-card>
               </li>
               <li>
                 <el-card class="card3">
-                <b>出处信息/代理属性：</b>
+                <b>出处信息：</b>
                 <ul class="light-gray">
                   <li  v-if="item.dataSource.references.length>0">
                     参考文献：
@@ -473,7 +481,7 @@
         <li v-if="summaryItem.result.resultValidation.dataResource.dataBaseInfo">
           输入数据：{{summaryItem.result.resultValidation.dataResource.dataBaseInfo.name}}
         </li>
-        <li v-if="summaryItem.result.resultValidation.resultOutput.name">
+        <li v-if="summaryItem.result.resultValidation.resultOutput">
           输出数据：
           <ul>
             <li v-if="summaryItem.result.resultValidation.resultOutput.name">
@@ -483,7 +491,7 @@
               描述：{{summaryItem.result.resultValidation.resultOutput.description}}
             </li>
             <li v-if="summaryItem.result.resultValidation.resultOutput.time">
-              生产时间：{{summaryItem.result.resultValidation.resultOutput.time}}
+              发布时间：{{summaryItem.result.resultValidation.resultOutput.time}}
             </li>
             <li v-if="summaryItem.result.resultValidation.resultOutput.storage"> 
               存储位置：{{summaryItem.result.resultValidation.resultOutput.storage}}
@@ -495,11 +503,14 @@
         </li>
       </ul>
       <div v-if="summaryItem.result.resultValidation.pictures.length>0">
-        <img style="margin-right:10px;width:150px;height:150px" v-for="item in summaryItem.result.resultValidation.pictures" :src="'http://172.21.213.216:8888/upload/getImg/'+item"/>
+      <PicturesDownload :fileList="summaryItem.result.resultValidation.pictures" fileName="结果验证"></PicturesDownload>
       </div>
       </div>
       <div style="display: flex;align-items:flex-end;">
-        <div v-if="summaryItem.result.resultValidation.video && summaryItem.result.resultValidation.video.id!=''">已上传视频：<el-tag>{{summaryItem.result.resultValidation.video.name}}</el-tag></div>
+        <div v-if="summaryItem.result.resultValidation.video && summaryItem.result.resultValidation.video.id!=''">
+        已上传视频：<el-tag>{{summaryItem.result.resultValidation.video.name}}</el-tag>
+        <el-button @click="downloadVideo(summaryItem.result.resultValidation.video)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
+        </div>
       </div>
       <h3>3.2 结果可视化</h3>
       <div>
@@ -541,7 +552,7 @@
         <li v-if="summaryItem.result.resultVisualization.dataResource.dataBaseInfo">
           输入数据：{{summaryItem.result.resultVisualization.dataResource.dataBaseInfo.name}}
         </li>
-        <li v-if="summaryItem.result.resultVisualization.resultOutput.name">
+        <li v-if="summaryItem.result.resultVisualization.resultOutput">
           输出数据：
           <ul>
             <li v-if="summaryItem.result.resultVisualization.resultOutput.name">
@@ -551,7 +562,7 @@
               描述：{{summaryItem.result.resultVisualization.resultOutput.description}}
             </li>
             <li v-if="summaryItem.result.resultVisualization.resultOutput.time">
-              生产时间：{{summaryItem.result.resultVisualization.resultOutput.time}}
+              发布时间：{{summaryItem.result.resultVisualization.resultOutput.time}}
             </li>
             <li v-if="summaryItem.result.resultVisualization.resultOutput.storage">
               存储位置：{{summaryItem.result.resultVisualization.resultOutput.storage}}
@@ -563,11 +574,14 @@
         </li>
       </ul>
       <div v-if="summaryItem.result.resultVisualization.pictures.length>0">
-        <img style="margin-right:10px;width:150px;height:150px" v-for="item in summaryItem.result.resultVisualization.pictures" :src="'http://172.21.213.216:8888/upload/getImg/'+item"/>
+      <PicturesDownload :fileList="summaryItem.result.resultVisualization.pictures" fileName="结果可视化"></PicturesDownload>
       </div>
       </div>
       <div style="display: flex;align-items:flex-end;">
-        <div v-if="summaryItem.result.resultVisualization.video && summaryItem.result.resultVisualization.video.id!=''">已上传视频：<el-tag>{{summaryItem.result.resultVisualization.video.name}}</el-tag></div>
+        <div v-if="summaryItem.result.resultVisualization.video && summaryItem.result.resultVisualization.video.id!=''">
+        已上传视频：<el-tag>{{summaryItem.result.resultVisualization.video.name}}</el-tag>
+        <el-button @click="downloadVideo(summaryItem.result.resultVisualization.video)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
+        </div>
       </div>
       <h3>3.3 结果分析</h3>
       <h4>(1) 结果分析及结论</h4>
@@ -577,31 +591,41 @@
       <p class="light-gray">{{summaryItem.result.conclusion.paper}}</p>
       </div>
       <div v-if="summaryItem.result.conclusion.pictures.length>0">
-      <img style="margin-right:10px;width:150px;height:150px" v-for="sitem in summaryItem.result.conclusion.pictures" :src="'http://172.21.213.216:8888/upload/getImg/'+sitem"/>
+      <PicturesDownload :fileList="summaryItem.result.conclusion.pictures" fileName="结果分析"></PicturesDownload>
       </div>
       <div style="display: flex;align-items:flex-end;">
-        <div v-if="summaryItem.result.conclusion.video && summaryItem.result.conclusion.video.id!=''">已上传视频：<el-tag>{{summaryItem.result.conclusion.video.name}}</el-tag></div>
+        <div v-if="summaryItem.result.conclusion.video && summaryItem.result.conclusion.video.id!=''">
+        已上传视频：<el-tag>{{summaryItem.result.conclusion.video.name}}</el-tag>
+        <el-button @click="downloadVideo(summaryItem.result.conclusion.video)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
+        </div>
       </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import ProcessCard from "./ProcessCard.vue";
+import ProcessCard from "./SummaryProcessCard.vue";
+import PicturesDownload from "./picturesDownload.vue";
 export default defineComponent({
   props:{
     summaryItem:{
       type:Object
     }
   },
-  components: { ProcessCard },
+  components: { ProcessCard,PicturesDownload },
   setup(props) {
     const summaryItem = (props.summaryItem as any)
+    const downloadVideo = async (video:any) => {
+      const name = video.name
+      const id = video.id
+        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/apply/download/${name}/${id}`
+    };
     onMounted(() => {
 
     })
     return{
-      summaryItem
+      summaryItem,
+      downloadVideo
     }
   }
 });

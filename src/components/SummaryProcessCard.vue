@@ -131,13 +131,15 @@
       <div style="display: flex;align-items:flex-end;">
         <div v-if="processVideoItem && processVideoItem.id!=''">已上传文件：<el-tag>{{processVideoItem.name}}</el-tag></div>
         <el-button v-if="processVideoItem && processVideoItem.id!=''" @click="downloadVideo(processVideoItem)" style="margin-left: 10px;" type="success" size="small" plain>下载</el-button>
-        <el-button v-if="processVideoItem && processVideoItem.id!=''" @click="deleteVideo" style="margin-left: 10px;" type="danger" size="small" plain>删除</el-button>
       </div>
       <slot name="button"></slot>
     </el-card>
   </div>
     <el-dialog v-if="dialogVisible" v-model="dialogVisible" :title="title" width="30%">
       <input-or-output-show v-if="dialogVisible" :info="dataItem"></input-or-output-show>
+    </el-dialog>
+    <el-dialog v-if="uploadProcessVideo" v-model="uploadProcessVideo">
+        <process-video-upload :videoItem="processVideoItem" :process="stepInfo" @returnVideo="returnProcessVideo"></process-video-upload>
     </el-dialog>
 </template>
 
@@ -167,10 +169,6 @@ export default defineComponent({
     const title = ref("");
     const inputOutputValue = ref<any[]>([]);
     const dataItem = ref<any>();
-
-    const processVideoItem = computed(() => {
-      return (props.stepInfo as any).video
-    })
     const stepInfo = computed(() => {
       return props.stepInfo as any
     })
@@ -215,7 +213,14 @@ export default defineComponent({
       }
 
     }
-
+    const processVideoItem = ref(
+      (props.stepInfo as any).video
+    );
+    const returnProcessVideo = (val: any[]) => {
+      processVideoItem.value = val
+      stepInfo.value.video = val
+      context.emit("returnProcessItemVideo", stepInfo,stepInfoId)
+    };
     const inputtagClick = (data: any[]) => {
       dataItem.value=data;
       title.value = "输入";
@@ -272,6 +277,7 @@ export default defineComponent({
       paramtagClick,
       uploadProcessVideo,
       processVideoItem,
+      returnProcessVideo,
       uploadClick,
       paramCheck,
       downloadVideo,

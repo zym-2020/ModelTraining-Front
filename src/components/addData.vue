@@ -25,21 +25,21 @@
       <el-form-item label="数据格式" prop="format">
         <el-input v-model="DataBaseInfoForm.format"  placeholder="例如：栅格数据、矢量数据" />
       </el-form-item>
-      <el-form-item label="数据版本" prop="version">
-        <el-input v-model="DataBaseInfoForm.version" placeholder="例如：V1"/>
-      </el-form-item>
-      <el-form-item label="生产时间" prop="produceTime">
-        <el-input v-model="DataBaseInfoForm.produceTime" placeholder="数据发布的时间" />
-      </el-form-item>
-      <el-form-item label="更新时间">
-        <el-input v-model="DataBaseInfoForm.updateTime" placeholder="数据更新的时间"/>
-      </el-form-item>
     </div>
     <div v-else-if="DataBaseInfoForm.type==='输入参数'">
       <el-form-item label="参数值" prop="parameter">
         <el-input v-model="DataBaseInfoForm.parameter"/>
       </el-form-item>
     </div>
+      <el-form-item label="数据版本" prop="version">
+        <el-input v-model="DataBaseInfoForm.version" placeholder="例如：V1"/>
+      </el-form-item>
+      <el-form-item label="发布时间" prop="produceTime">
+        <el-input v-model="DataBaseInfoForm.produceTime" placeholder="数据发布的时间" />
+      </el-form-item>
+      <el-form-item label="更新时间">
+        <el-input v-model="DataBaseInfoForm.updateTime" placeholder="数据更新的时间"/>
+      </el-form-item>
     <h4  class="mh4"><el-icon><CaretBottom /></el-icon>时间尺度:</h4>
     <ul class="mul">
       <li>
@@ -49,22 +49,17 @@
       </li>
       <li>
         <div class="mflex">
-          <div class="text">尺度</div><el-input class="liinput" v-model="DataBaseInfoForm.time.scale" placeholder="全国尺度"/>
+          <div class="text">尺度</div><el-input class="liinput" v-model="DataBaseInfoForm.time.scale" autosize type="textarea" placeholder="1. 百万年以上；2. 百万年尺度；3. 万年尺度；4. 千年尺度；5. 百年尺度；6. 10 年尺度；7. 年；8. 月；9. 日；10. 日以下；11. 基于事件（次，如降水）"/>
         </div>
       </li>
       <li>
         <div class="mflex">
-          <div class="text">范围</div><el-input class="liinput" v-model="DataBaseInfoForm.time.scope" placeholder="2008-2016年9年间的夏季"/>
+          <div class="text">范围</div><el-input class="liinput" v-model="DataBaseInfoForm.time.scope" placeholder="2008-2016年9年间的6月-7月"/>
         </div>
       </li>
       <li>
         <div class="mflex">
           <div class="text">步长</div><el-input class="liinput" v-model="DataBaseInfoForm.time.length" placeholder="1天"/>
-        </div>
-      </li>
-      <li>
-        <div class="mflex">
-          <div class="text">单位</div><el-input class="liinput" v-model="DataBaseInfoForm.time.unit" />
         </div>
       </li>
     </ul>
@@ -77,7 +72,7 @@
       </li>
       <li>
         <div class="mflex">
-          <div class="text">尺度</div><el-input class="liinput" v-model="DataBaseInfoForm.space.scale" placeholder="全国尺度"/>
+          <div class="text">尺度</div><el-input class="liinput" v-model="DataBaseInfoForm.space.scale" autosize type="textarea" placeholder="1. 全球尺度；2. 洲际尺度；3. 区域尺度；4. 流域尺度；5. 基本单元（地块尺度）"/>
         </div>
       </li>
       <li>
@@ -92,14 +87,13 @@
       </li>
       <li>
         <div class="mflex">
-          <div class="text">单位</div><el-input class="liinput" v-model="DataBaseInfoForm.space.unit"/>
+          <div class="text">参考系</div><el-input class="liinput" v-model="DataBaseInfoForm.space.unit"/>
         </div>
       </li>
     </ul>
   </el-form>
-    <h3>活动信息</h3>
+    <h3>数据预处理信息</h3>
   <el-form ref="ruleFormRef" :model="DataActiveForm" status-icon label-width="120px" class="demo-ruleForm">
-    <h4 class="nh4"><el-icon><CaretBottom /></el-icon>数据处理步骤:</h4>
     <ul class="mul">
       <li>
         <div class="mflex">
@@ -112,22 +106,8 @@
         </div>
       </li>
     </ul>
-    <h4 class="nh4"><el-icon><CaretBottom /></el-icon>数据转化步骤:</h4>
-    <ul class="mul">
-
-      <li>
-        <div class="mflex">
-          <div class="text">名称</div><el-input class="liinput" v-model="DataActiveForm.conversionName"  placeholder="数据转化步骤名称"/>
-        </div>
-      </li>
-      <li>
-        <div class="mflex">
-         <div class="text">描述</div> <el-input class="liinput" v-model="DataActiveForm.conversionDescription" type="textarea" placeholder="说明该数据之前进行了哪些数据转化步骤"/>
-        </div>
-      </li>
-    </ul>
   </el-form>
-    <h3>出处信息/代理属性</h3>
+    <h3>出处信息</h3>
   <el-form ref="ruleFormRef" :model="DataSourceForm" status-icon label-width="120px" class="demo-ruleForm" :rules="rules">
     <el-form-item label="参考文献">
         <el-tag
@@ -409,7 +389,7 @@ export default defineComponent({
         { required: true, message: '请输入数据格式', trigger: 'change' }
       ],
       produceTime: [
-        { required: true, message: '请输入生产时间', trigger: 'change' }
+        { required: true, message: '请输入发布时间', trigger: 'change' }
       ],
       parameter:[
         { required: true, message: '请输入参数值', trigger: 'change' }
@@ -466,18 +446,18 @@ export default defineComponent({
         notice("warning", "失败", "“数据格式”不能为空")
         return
         }
-        if(!DataBaseInfoForm.version){
-          notice("warning", "失败", "“数据版本”不能为空")
-          return
-        }
-        if(!DataBaseInfoForm.produceTime){
-          notice("warning", "失败", "“生产时间”不能为空")
-          return
-        }
-        if(!DataSourceForm.publish){
-          notice("warning", "失败", "“出版机构”不能为空")
-          return
-        }
+      }
+      if(!DataBaseInfoForm.version){
+        notice("warning", "失败", "“数据版本”不能为空")
+        return
+      }
+      if(!DataBaseInfoForm.produceTime){
+        notice("warning", "失败", "“发布时间”不能为空")
+        return
+      }
+      if(!DataSourceForm.publish){
+        notice("warning", "失败", "“出版机构”不能为空")
+        return
       }
       dataResource.dataBaseInfo.name = DataBaseInfoForm.name
       dataResource.dataBaseInfo.description = DataBaseInfoForm.description
@@ -540,18 +520,18 @@ export default defineComponent({
         notice("warning", "失败", "“数据格式”不能为空")
         return
         }
-        if(!DataBaseInfoForm.version){
-          notice("warning", "失败", "“数据版本”不能为空")
-          return
-        }
-        if(!DataBaseInfoForm.produceTime){
-          notice("warning", "失败", "“生产时间”不能为空")
-          return
-        }
-        if(!DataSourceForm.publish){
-          notice("warning", "失败", "“出版机构”不能为空")
-          return
-        }
+      }
+      if(!DataBaseInfoForm.version){
+        notice("warning", "失败", "“数据版本”不能为空")
+        return
+      }
+      if(!DataBaseInfoForm.produceTime){
+        notice("warning", "失败", "“发布时间”不能为空")
+        return
+      }
+      if(!DataSourceForm.publish){
+        notice("warning", "失败", "“出版机构”不能为空")
+        return
       }
       dataResource.dataBaseInfo.name = DataBaseInfoForm.name
       dataResource.dataBaseInfo.description = DataBaseInfoForm.description

@@ -2,7 +2,9 @@
   <div class="apply-home">
     <div class="title">
       <h2>完成情况</h2><h5 style="color:rgb(150,150,150);margin-left: 10px;">最终仅会提交最新版用于竞赛评审</h5>
-      </div>
+      <el-button v-if="form.type===''" style="margin-left:600px;margin-bottom: 10px;" type="primary"  size="small" @click="topicClick" plain>题目选择</el-button>
+      <el-button v-else style="margin-left:600px;margin-bottom: 10px;" type="primary"  size="small" @click="topicClick" plain>题目修改</el-button>
+    </div>
     <el-divider style="margin-top:0px" />
     <div v-if="summaryTabs.length>0">
       <el-tabs 
@@ -24,17 +26,39 @@
       </el-tabs>
     </div>
   </div>
-  
+  <el-dialog v-if="Flag" v-model="Flag" width="360px"  title="参与竞赛题目选择">
+    <el-form label-position="right" label-width="110px" :model="form" :rules="rules">
+      <el-form-item label="竞赛类型" prop="type">
+        <el-select v-model="form.type" placeholder="请选择竞赛类型">
+          <el-option label="模型应用竞赛" value="模型应用竞赛" />
+          <el-option label="模型开发竞赛" value="模型开发竞赛" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="竞赛题目" prop="problem">
+        <el-select v-model="form.problem" placeholder="请选择竞赛题目">
+          <el-option label="问题1" value="问题1" />
+          <el-option label="问题2" value="问题2" />
+          <el-option v-if="form.type==='模型应用竞赛'" label="问题3" value="问题3" />
+          <el-option v-if="form.type==='模型应用竞赛'" label="问题4" value="问题4" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="研究项目名称" prop="title">
+        <el-input v-model="form.title" placeholder="请输入研究项目名称"/>
+      </el-form-item>
+    </el-form>
+    <div class="btn">
+      <el-button type="primary" plain @click="setTopicClick" >确定</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, computed } from "vue";
+import { defineComponent, onMounted, ref, computed,reactive } from "vue";
 import { notice } from "@/utils/notice";
 import summaryTab from "@/components/summaryTab.vue";
 import router from "@/router";
-import { addSummary } from "@/api/request";
-import { deleteSummary } from "@/api/request";
-import { ElMessageBox } from 'element-plus'
+import { addSummary, saveTopic, deleteSummary } from "@/api/request";
+import { ElMessageBox, FormRules } from 'element-plus'
 export default defineComponent({
   props:{
     researcherValue: {
@@ -51,13 +75,58 @@ export default defineComponent({
     },
     summaryValue:{
       type:Object
+    },
+    topicValue:{
+      type:Object
     }
   },
   components:{summaryTab},
-  setup(props) {
-    //const summaryTabs = ref<any[]>((router.currentRoute.value.params.apply as any).summary);
+  emits: ['returnTopic'],
+  setup(props,context) {
+    const Flag = ref(false)
     const summaryTabs = ref<any[]>(props.summaryValue as any);
     const editableTabsValue = ref((props.summaryValue as any).length-1)
+    const form = reactive({
+      type: "",
+      problem: "",
+      title:""
+    });
+    const setTopicClick = async() =>{
+      if (form.type === '') {
+        notice("warning", "失败", "请选择竞赛类型")
+        return
+      }
+      if (form.problem === '') {
+        notice("warning", "失败", "请选择竞赛题目")
+        return
+      }
+      if (form.title === '') {
+        notice("warning", "失败", "请输入研究项目名称")
+        return
+      }
+      const topic = {
+        type: form.type,
+        problem: form.problem,
+        title:form.title,
+      }
+      const data = await saveTopic((router.currentRoute.value.params.apply as any).id, topic)
+      if (data != null && (data as any).code === 0) {
+        notice("success", "成功", "保存成功")
+        Flag.value = false
+        context.emit('returnTopic', topic)
+      }
+    }
+    const rules = reactive<FormRules>({
+      type: [
+        { required: true, message: '请选择竞赛类型', trigger: 'change' }
+      ],
+      problem:[
+        { required: true, message: '请选择竞赛题目', trigger: 'change' }
+      ],
+      title: [
+        { required: true, message: '请输入研究项目题目', trigger: 'change' }
+      ],
+    })
     const addTab = async () => {
       const summaryItem = {
         description:(props.descriptionValue as any),
@@ -194,15 +263,32 @@ export default defineComponent({
         notice("success", "成功", "删除成功！");
       }
     }
+
+    const topicClick = () =>{
+      Flag.value = true
+    }
+
   onMounted(()=>{
-    
+    if((props.topicValue as any))
+    {
+      form.type = (props.topicValue as any).type
+      form.problem = (props.topicValue as any).problem
+      form.title = (props.topicValue as any).title
+    }else{
+      Flag.value = true
+    }
   })
   return{
     editableTabsValue,
     addTab,
     removeTab,
     summaryTabs,
-    handleClose
+    handleClose,
+    topicClick,
+    setTopicClick,
+    Flag,
+    form,
+    rules
   }
   }
 });
@@ -212,10 +298,13 @@ export default defineComponent({
 .apply-home {
   padding-left: 20px;
   width: 1000px;
+  min-height:450px;
 }
 .title{
   display: flex;
-   align-items:flex-end;
-   width: 1400px;
+  align-items: flex-end
+}
+.btn {
+  text-align: center;
 }
 </style>

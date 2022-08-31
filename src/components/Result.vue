@@ -53,13 +53,13 @@
       </li>
       <li>
         <div class="mflexa">
-          <div class="text"><div class="necess">*</div>生产时间</div><el-input class="liinput" v-model="resultValidationForm.resultOutput.time" />
+          <div class="text"><div class="necess">*</div>发布时间</div><el-input class="liinput" v-model="resultValidationForm.resultOutput.time" />
         </div>
       </li>
       <li>
         <div class="mflexa">
           <div class="text" style="width:135px"><div class="necess">*</div>数据存储位置</div>
-            <el-input v-model="resultValidationForm.resultOutput.storage" placeholder="详细说明获取该数据的原始路径" :readonly="resultValidationForm.resultOutput.isUpload==='true'"/>
+            <el-input v-model="resultValidationForm.resultOutput.storage" placeholder="详细说明获取该数据的原始路径（下载链接）" :readonly="resultValidationForm.resultOutput.isUpload==='true'"/>
             <a style="margin-left:10px">或</a><el-button style="margin-left:10px" type="primary" @click="storageUpload1">上传</el-button>
         </div>
       </li>
@@ -113,15 +113,15 @@
           <el-input v-model="resultVisualizationForm.softVersion" placeholder="需要说明所需的软件版本"/>
         </el-form-item>
         <el-form-item label="存储位置" prop="softStorage">
-          <el-input v-model="resultVisualizationForm.softStorage" placeholder="详细说明获取该软件的原始路径"/>
+          <el-input v-model="resultVisualizationForm.softStorage" placeholder="详细说明获取该软件的原始路径（下载链接）"/>
         </el-form-item>
         <el-form-item label="软件依赖" prop="softDepend" >
           <el-input v-model="resultVisualizationForm.softDepend" placeholder="详细说明软件涉及的依赖"/>
         </el-form-item>
       </div>
       <div v-if="resultVisualizationForm.stepType==='可视化方法'">
-        <el-form-item label="代码内容" prop="codeContent">
-          <el-input v-model="resultVisualizationForm.codeContent"/>
+        <el-form-item label="代码内容" prop="codeContent" >
+          <el-input v-model="resultVisualizationForm.codeContent" :rows="3" type="textarea"/>
         </el-form-item>
         <el-form-item label="编程语言" prop="codeLanguage" >
           <el-input v-model="resultVisualizationForm.codeLanguage" placeholder="例如：Fortran77, Fortran90, C, C++, Python, Java, IDL, Matlab等"/>
@@ -152,13 +152,13 @@
       </li>
       <li>
         <div class="mflexa">
-          <div class="text"><div class="necess">*</div>生产时间</div><el-input class="liinput" v-model="resultVisualizationForm.resultOutput.time" />
+          <div class="text"><div class="necess">*</div>发布时间</div><el-input class="liinput" v-model="resultVisualizationForm.resultOutput.time" />
         </div>
       </li>
       <li>
         <div class="mflexa">
           <div class="text" style="width:135px"><div class="necess">*</div>数据存储位置</div>
-            <el-input v-model="resultVisualizationForm.resultOutput.storage" placeholder="详细说明获取该数据的原始路径" :readonly="resultVisualizationForm.resultOutput.isUpload==='true'"/>
+            <el-input v-model="resultVisualizationForm.resultOutput.storage" placeholder="详细说明获取该数据的原始路径（下载链接）" :readonly="resultVisualizationForm.resultOutput.isUpload==='true'"/>
             <a style="margin-left:10px">或</a><el-button style="margin-left:10px" type="primary" @click="storageUpload2">上传</el-button>
         </div>
       </li>
@@ -475,6 +475,13 @@ export default defineComponent({
         message: '请选择',
         trigger: 'change'
       }],
+      softName: [{required: true,message: '请输入软件需求',trigger: 'change'}],
+      softVersion: [{required: true,message: '请输入软件版本',trigger: 'change'}],
+      softStorage: [{required: true,message: '请输入存储位置',trigger: 'change'}],
+      softDepend: [{required: true,message: '请输入软件依赖',trigger: 'change'}],
+      codeContent: [{required: true,message: '请输入代码内容',trigger: 'change'}],
+      codeLanguage: [{required: true,message: '请输入编程语言',trigger: 'change'}],
+      codeDepend: [{required: true,message: '请输入模型依赖库',trigger: 'change'}],
     })
     const saveClick = async () => {
       if(!conclusionForm.conclusionText){

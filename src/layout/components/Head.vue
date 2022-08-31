@@ -17,15 +17,9 @@
       </div>
       <div
         :class="active === 2 ? 'menu-item active' : 'menu-item'"
-        @click="toNav('/apply')"
+        @click="toNav('/modelTrainingCourse/submission/apply')"
       >
-        模型应用竞赛
-      </div>
-      <div
-        :class="active === 3 ? 'menu-item active' : 'menu-item'"
-        @click="toNav('/develp')"
-      >
-        模型开发竞赛
+        模型应用/开发竞赛
       </div>
       <div
         :class="active === 4 ? 'menu-item active' : 'menu-item'"
@@ -67,7 +61,10 @@ export default defineComponent({
       } else if (type === "/modelTrainingCourse/submission/certificate") {
         router.push({ path: type });
         active.value = 4;
-      } else {
+      } else if (type === "/modelTrainingCourse/submission/apply") {
+        router.push({ path: type });
+        active.value = 2;
+      }else {
         notice("warning", "警告", "页面暂未开放");
       }
     };

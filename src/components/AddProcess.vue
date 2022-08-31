@@ -78,13 +78,6 @@
           :rows="3"
         />
       </el-form-item>
-      <h5 class="rtext">单张图片大小限制为2.5M</h5>
-      <el-form-item label="添加图片">
-        <picture-upload
-          :pictureList="pictureList"
-          @returnPictureList="handlePictures"
-        ></picture-upload>
-      </el-form-item>
     <el-form-item label="参考文献">
         <el-tag
           v-for="tag in form.references"
@@ -109,7 +102,20 @@
           + 添加参考文献
         </el-button>
     </el-form-item>
-    <h5 style="margin-left: 50px;color:rgb(150,150,150);">建议格式:[1]岳天祥,刘纪远.生态地理建模中的多尺度问题[J].第四纪研究,2003(03):256-261.</h5>
+    <h5 style="margin-left: 30px;color:rgb(150,150,150);">建议格式:[1]岳天祥,刘纪远.生态地理建模中的多尺度问题[J].第四纪研究,2003(03):256-261.</h5>
+      <el-form-item label="添加图片">
+        <picture-upload
+          :pictureList="pictureList"
+          @returnPictureList="handlePictures"
+        ></picture-upload>
+      </el-form-item>
+      <el-form-item label="添加视频" style="display: flex;align-items:flex-end;">
+      <div style="display: flex;align-items:center;">
+        <el-button v-if="!(processVideoItem && processVideoItem.id!='')" style="margin-top: 20px;margin-right: 10px;" type="primary" @click="uploadClick" >视频上传</el-button>
+        <div v-if="processVideoItem && processVideoItem.id!=''">已上传文件：<el-tag>{{processVideoItem.name}}</el-tag></div>
+        <el-button v-if="processVideoItem && processVideoItem.id!=''" @click="deleteVideo" style="margin-left: 10px;" type="danger" size="small" plain>删除</el-button>
+        </div>
+      </el-form-item>
       <el-form-item label="其他补充">
         <el-input v-model="form.other"  type="textarea" />
       </el-form-item>
@@ -126,20 +132,24 @@
     </div>
   </div>
   </el-scrollbar>
+  <el-dialog v-if="uploadProcessVideo" v-model="uploadProcessVideo">
+    <process-video-upload :type="type" :videoItem="processVideoItem" :process="processItem" @returnVideo="returnProcessVideo"></process-video-upload>
+</el-dialog>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive, ref, nextTick } from "vue";
 import PictureUpload from "./PictureUpload.vue";
-import VideoUpload from "./SchemeVideoUpload.vue";
 import { Plus,MoreFilled } from "@element-plus/icons-vue";
 import ProcessVideoUpload from "./ProcessVideoUpload.vue";
+import { getProcessLength, removeProcessVideoFile, removeTempVideoFile} from "@/api/request";
 import { notice } from "@/utils/notice";
 import type {  FormRules, ElTable, ElInput } from 'element-plus'
 import { equal } from "assert";
+import router from "@/router";
 
 export default defineComponent({
-  components: { PictureUpload, VideoUpload },
+  components: { PictureUpload,ProcessVideoUpload },
   props: {
     processItem: {
       type: Object,
@@ -173,6 +183,9 @@ export default defineComponent({
     const inputCheck = ref<any[]>([])
     const outputCheck  = ref<any[]>([])
     const paramCheck = ref<any[]>([])
+    const processItem = computed(() => {
+      return props.processItem;
+    });
     const type = computed(() => {
       return props.operateType;
     });
@@ -182,42 +195,33 @@ export default defineComponent({
     const processVideoItem = ref(
       (props.processItem as any).video
     );
-    const returnProcessVideo = (val: any[]) => {
+    const returnProcessVideo = (val: any) => {
       processVideoItem.value = val
+      form.video = JSON.parse(JSON.stringify(val))
     };
-    // const addDataDialog = () =>{
-    //   if(form.dataResources){
-    //   for(let i=0;i<form.modelResources.length;++i){
-    //     for(let j=0;j<form.modelResources[i].modelMetaData.modelInputs.length;++j){
-    //       form.modelResources[i].modelMetaData.modelInputs[j].dataResource = null
-    //     }
-    //     for(let j=0;j<form.modelResources[i].modelMetaData.modelOutputs.length;++j){
-    //       form.modelResources[i].modelMetaData.modelOutputs[j].dataResource = null;
-    //     }
-    //   }
-    //   }
 
-    //   form.dataResources.splice(0,form.dataResources.length)
-    //   addData.value=true
-    // }
-    // const modelSelectionChange = (val: any) =>{
-    //     modelSelections.value=JSON.parse(JSON.stringify(val))
-    //     for(let i=0;i<val.length;++i){
-    //         inputSelect.value[i] = val[i].modelMetaData.modelInputs
-    //         outputSelect.value[i] = val[i].modelMetaData.modelOutputs
-    //         paramSelect.value[i] = val[i].modelMetaData.parameters
-    //     }
-          
-    // }
-    // const modelmultipleTableRef = ref<InstanceType<typeof ElTable>>()
-    // const datamultipleTableRef = ref<InstanceType<typeof ElTable>>()
-    // const modeltoggleSelection = () => {
-    //   modelmultipleTableRef.value!.clearSelection()
-    // }
+    const deleteVideo = async () => {
+      if(type.value!="add"){
+        const data = await removeProcessVideoFile((router.currentRoute.value.params.apply as any).id,processItem.value);
+        if (data != null && (data as any).code === 0) {
+          notice("success", "成功", "删除成功！");
+          processVideoItem.value.name = ''
+          processVideoItem.value.id = ''
+        }
+      }
+      else{
+        const data = await removeTempVideoFile((router.currentRoute.value.params.apply as any).id, {uuid:processVideoItem.value.id});
+        if (data != null && (data as any).code === 0) {
+          notice("success", "成功", "删除成功！");
+          processVideoItem.value.name = ''
+          processVideoItem.value.id = ''
+        }
+      }
+    }
 
-    // const datatoggleSelection = () => {
-    //   datamultipleTableRef.value!.clearSelection()
-    // }
+    const uploadClick = async() =>{
+      uploadProcessVideo.value=true
+    }
 
     const rules = reactive<FormRules>({
       name: [
@@ -280,82 +284,6 @@ export default defineComponent({
       inputVisible.value = false
       inputValue.value = ''
     }
-    // const addModelClick = () => {
-    //   for(let i=0;i<modelSelections.value.length;++i){
-    //     if(!inputCheck.value[i] || inputCheck.value[i].length===0){
-    //     notice("warning", "失败", modelSelections.value[i].modelBaseInfo.name+"的“输入信息”不能为空")
-    //     return
-    //     }
-    //     if(!outputCheck.value[i] || outputCheck.value[i].length===0){
-    //     notice("warning", "失败", modelSelections.value[i].modelBaseInfo.name+"的“输出信息”不能为空")
-    //     return
-    //     }
-    //   }
-    //   form.modelResources=modelSelections.value
-    //   for(let i=0;i<form.modelResources.length;++i){
-    //     if(inputCheck.value[i])
-    //       form.modelResources[i].modelMetaData.modelInputs = inputCheck.value[i]
-    //     else
-    //       form.modelResources[i].modelMetaData.modelInputs = []
-    //     if(outputCheck.value[i])
-    //       form.modelResources[i].modelMetaData.modelOutputs = outputCheck.value[i]
-    //     else
-    //       form.modelResources[i].modelMetaData.modelOutputs = []
-    //     if(paramCheck.value[i])
-    //       form.modelResources[i].modelMetaData.parameters = paramCheck.value[i]
-    //     else
-    //       form.modelResources[i].modelMetaData.parameters = []
-    //   }
-    //   addModel.value = false;
-    // };
-    // const addDataClick = () => {
-    //   for(let i=0;i<form.modelResources.length;++i){
-    //     for(let j=0;j<form.modelResources[i].modelMetaData.modelInputs.length;++j){
-    //       if(form.modelResources[i].modelMetaData.modelInputs[j].dataResource===null){
-    //         notice("warning", "失败", "“输入信息”不能为空")
-    //         return
-    //       }
-    //     }
-    //     for(let j=0;j<form.modelResources[i].modelMetaData.modelOutputs.length;++j){
-    //       if(form.modelResources[i].modelMetaData.modelOutputs[j].dataResource===null){
-    //         notice("warning", "失败", "“输出信息”不能为空")
-    //         return
-    //       }
-    //     }
-    //   }
-    //   const dataSelect = []
-    //   for(let i=0;i<form.modelResources.length;++i){
-    //      for(let j=0;j<form.modelResources[i].modelMetaData.modelInputs.length;++j){
-    //       let f = true
-    //       for(let t=0;t<dataSelect.length;++t)
-    //         if(JSON.stringify(dataSelect[t]) === JSON.stringify(form.modelResources[i].modelMetaData.modelInputs[j].dataResource)){
-    //           f = false
-    //           break
-    //         }
-    //       if(f)
-    //         dataSelect.push(form.modelResources[i].modelMetaData.modelInputs[j].dataResource)
-    //      }
-    //       for(let j=0;j<form.modelResources[i].modelMetaData.modelOutputs.length;++j){
-    //         let f = true
-    //         for(let t=0;t<dataSelect.length;++t)
-    //           if(JSON.stringify(dataSelect[t]) === JSON.stringify(form.modelResources[i].modelMetaData.modelOutputs[j].dataResource)){
-    //             f = false
-    //             break
-    //           }
-    //         if(f)
-    //         dataSelect.push(form.modelResources[i].modelMetaData.modelOutputs[j].dataResource)
-    //      }
-    //   }
-    //   form.dataResources=dataSelect
-    //   addData.value = false;
-    // };
-
-    // const ModelClose = (index: number) => {
-    //   form.modelResources.splice(index, 1);
-    // };
-    // const DataClose = (index: number) => {
-    //   form.dataResources.splice(index, 1);
-    // };
 
     const addProcessClick = () => {
       if(!form.name){
@@ -378,8 +306,10 @@ export default defineComponent({
       let flag = false
       for(let i = 0; i < form.modelResource.modelMetaData.modelInputs.length; ++i)
       {
-        if(form.modelResource.modelMetaData.modelInputs[i].dataResource===null||form.modelResource.modelMetaData.modelInputs[i].dataResource ===""){
-          form.modelResource.modelMetaData.modelInputs[i].dataResource = null
+        if(form.modelResource.modelMetaData.modelInputs[i].dataResource===undefined
+        ||form.modelResource.modelMetaData.modelInputs[i].dataResource ===""
+        ||form.modelResource.modelMetaData.modelInputs[i].dataResource ===null){
+          form.modelResource.modelMetaData.modelInputs[i].dataResource=null
         }
         else {
           let exist = false
@@ -402,8 +332,10 @@ export default defineComponent({
       flag = false
       for(let i = 0; i < form.modelResource.modelMetaData.modelOutputs.length; ++i)
       {
-        if(form.modelResource.modelMetaData.modelOutputs[i].dataResource ===null||form.modelResource.modelMetaData.modelOutputs[i].dataResource ===""){
-          form.modelResource.modelMetaData.modelOutputs[i].dataResource = null
+        if(form.modelResource.modelMetaData.modelOutputs[i].dataResource ===undefined
+        ||form.modelResource.modelMetaData.modelOutputs[i].dataResource ===""
+        ||form.modelResource.modelMetaData.modelOutputs[i].dataResource ===null){
+          form.modelResource.modelMetaData.modelOutputs[i].dataResource=null
         }
         else {
           let exist = false
@@ -424,8 +356,10 @@ export default defineComponent({
       }
       for(let i = 0; i < form.modelResource.modelMetaData.parameters.length; ++i)
       {
-        if(form.modelResource.modelMetaData.parameters[i].dataResource===null||form.modelResource.modelMetaData.parameters[i].dataResource ===""){
-          form.modelResource.modelMetaData.parameters[i].dataResource = null
+        if(form.modelResource.modelMetaData.parameters[i].dataResource===undefined 
+        ||form.modelResource.modelMetaData.parameters[i].dataResource ===""
+        ||form.modelResource.modelMetaData.parameters[i].dataResource ===null){
+          form.modelResource.modelMetaData.parameters[i].dataResource=null
         }
         else {
           let exist = false
@@ -466,8 +400,10 @@ export default defineComponent({
        let flag = false
       for(let i = 0; i < form.modelResource.modelMetaData.modelInputs.length; ++i)
       {
-        if(form.modelResource.modelMetaData.modelInputs[i].dataResource===null||form.modelResource.modelMetaData.modelInputs[i].dataResource ===""){
-          form.modelResource.modelMetaData.modelInputs[i].dataResource = null
+        if(form.modelResource.modelMetaData.modelInputs[i].dataResource===undefined
+        ||form.modelResource.modelMetaData.modelInputs[i].dataResource ===""
+        ||form.modelResource.modelMetaData.modelInputs[i].dataResource ===null){
+          form.modelResource.modelMetaData.modelInputs[i].dataResource=null
         }
         else {
           let exist = false
@@ -489,8 +425,10 @@ export default defineComponent({
       flag = false
       for(let i = 0; i < form.modelResource.modelMetaData.modelOutputs.length; ++i)
       {
-        if(form.modelResource.modelMetaData.modelOutputs[i].dataResource ===null||form.modelResource.modelMetaData.modelOutputs[i].dataResource ===""){
-          form.modelResource.modelMetaData.modelOutputs[i].dataResource = null
+        if(form.modelResource.modelMetaData.modelOutputs[i].dataResource ===undefined
+        ||form.modelResource.modelMetaData.modelOutputs[i].dataResource ===""
+        ||form.modelResource.modelMetaData.modelOutputs[i].dataResource ===null){
+          form.modelResource.modelMetaData.modelOutputs[i].dataResource =null
         }
         else {
           let exist = false
@@ -511,8 +449,10 @@ export default defineComponent({
       }
       for(let i = 0; i < form.modelResource.modelMetaData.parameters.length; ++i)
       {
-        if(form.modelResource.modelMetaData.parameters[i].dataResource===null||form.modelResource.modelMetaData.parameters[i].dataResource ===""){
-          form.modelResource.modelMetaData.parameters[i].dataResource = null
+        if(form.modelResource.modelMetaData.parameters[i].dataResource===undefined
+        ||form.modelResource.modelMetaData.parameters[i].dataResource ===""
+        ||form.modelResource.modelMetaData.parameters[i].dataResource ===null){
+          form.modelResource.modelMetaData.parameters[i].dataResource=null
         }
         else {
           let exist = false
@@ -551,16 +491,6 @@ export default defineComponent({
       Plus,
       MoreFilled,
       modelSelections,
-      // addModelClick,
-      // ModelClose,
-      // addDataClick,
-      // DataClose,
-      // modeltoggleSelection,
-      // modelmultipleTableRef,
-      // datatoggleSelection,
-      // datamultipleTableRef,
-      // modelSelectionChange,
-      // addDataDialog,
       addProcessClick,
       updateProcessClick,
       handlePictures,
@@ -585,7 +515,9 @@ export default defineComponent({
       paramCheck,
       returnProcessVideo,
       processVideoItem,
-      uploadProcessVideo
+      uploadProcessVideo,
+      deleteVideo,
+      uploadClick
     };
   },
 });

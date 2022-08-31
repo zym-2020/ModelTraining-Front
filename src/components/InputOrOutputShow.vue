@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="process-item">
-        <strong>生产时间：</strong>
+        <strong>发布时间：</strong>
         <div class="text" :title="info.dataBaseInfo.produceTime">
           {{ info.dataBaseInfo.produceTime }}
         </div>

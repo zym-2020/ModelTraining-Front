@@ -7,6 +7,7 @@
     <el-table :data="tableData" style="width: 100%" border>
       <el-table-column prop="teamId" label="团队编号" width="300" />
       <el-table-column prop="name" label="姓名" />
+      <el-table-column prop="memberId" label="成员编号" />
     </el-table>
     <div class="title1">
       <h2 style="color:lightcoral;margin-right:5px">*</h2>

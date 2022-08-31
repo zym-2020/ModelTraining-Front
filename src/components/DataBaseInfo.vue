@@ -17,7 +17,7 @@
         <el-form-item label="版本">
           <el-input v-model="dataBaseInfo.version" @change="changeHandle" />
         </el-form-item>
-        <el-form-item label="数据生产时间" prop="produceTime">
+        <el-form-item label="数据发布时间" prop="produceTime">
           <el-input v-model="dataBaseInfo.produceTime" @change="changeHandle" />
         </el-form-item>
       </el-form>
@@ -86,7 +86,7 @@ export default defineComponent({
         { required: true, message: '请输入格式', trigger: 'change' }
       ],
       produceTime: [
-        { required: true, message: '请输入数据生产时间', trigger: 'change' }
+        { required: true, message: '请输入数据发布时间', trigger: 'change' }
       ],
       spaceTimeScale: [
         { required: true, message: '请输入时空尺度', trigger: 'change' }

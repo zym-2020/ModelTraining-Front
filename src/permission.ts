@@ -3,7 +3,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { RouteLocationNormalized } from 'vue-router'
 import { getToken } from '@/utils/auth'
-import { getByTeamId, getUserInfo } from '@/api/request'
+import { getById, getUserInfo } from '@/api/request'
 import { notice } from './utils/notice'
 
 NProgress.configure({ showSpinner: false })
@@ -16,11 +16,17 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
             NProgress.done()
         } else {
             if (to.name === 'Apply') {
-                const data = await getByTeamId()
+                const data = await getById()
                 if (data != null && (data as any).code === 0) {
-                    to.params.apply = data.data
-                    next()
-                    NProgress.done()
+                    if (data.data.teamId && data.data.teamId != '') {
+                        to.params.apply = data.data
+                        next()
+                        NProgress.done()
+                    } else {
+                        notice('warning', '警告', '您尚未报名模型竞赛，暂无访问权限')
+                        next('/modelTrainingCourse/submission/404')
+                        NProgress.done()
+                    }
                 }
             } else if (to.name === 'Homework') {
                 const data = await getUserInfo()

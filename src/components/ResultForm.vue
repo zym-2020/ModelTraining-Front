@@ -18,7 +18,7 @@
       <el-form-item label="结果版本" prop="version">
         <el-input v-model="resultForm.version" @change="changeHandle" />
       </el-form-item>
-      <el-form-item label="生产时间" prop="time">
+      <el-form-item label="发布时间" prop="time">
         <el-input v-model="resultForm.time" @change="changeHandle" />
       </el-form-item>
       <el-form-item label="更新时间" prop="updateTime">
@@ -300,7 +300,7 @@ export default defineComponent({
         { required: true, message: '请输入结构格式', trigger: 'change' }
       ],
       time: [
-        { required: true, message: '请输入生产时间', trigger: 'change' }
+        { required: true, message: '请输入发布时间', trigger: 'change' }
       ],
       spacetimescales: [
         { required: true, message: '请添加时空尺度', trigger: 'change' }

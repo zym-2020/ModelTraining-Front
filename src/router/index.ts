@@ -33,17 +33,17 @@ const routes: Array<RouteRecordRaw> = [
       }
     ]
   },
-  // {
-  //   path: '/apply',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: '',
-  //       name: 'Apply',
-  //       component: () => import('@/views/ApplyHomework.vue')
-  //     }
-  //   ]
-  // },
+  {
+    path: '/apply',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'Apply',
+        component: () => import('@/views/ApplyHomework.vue')
+      }
+    ]
+  },
   // {
   //   path: '/develp',
   //   component: Layout,

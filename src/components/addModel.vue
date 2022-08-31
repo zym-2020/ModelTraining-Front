@@ -36,7 +36,7 @@
     </div>
     <div v-if="ModelBaseInfoForm.type==='服务'">
       <el-form-item label="服务存储位置" prop="serverStorage">
-        <el-input v-model="ModelBaseInfoForm.serverStorage" placeholder="详细说明服务的URL地址" />
+        <el-input v-model="ModelBaseInfoForm.serverStorage" placeholder="详细说明获取该模型的原始路径（下载链接）" />
       </el-form-item>
     </div>
     <div v-if="ModelBaseInfoForm.type==='代码'">
@@ -89,8 +89,14 @@
     <el-input  v-model="ModelBaseInfoForm.refSystemSpace.name" placeholder="WGS 84、Beijing 1954"/>
     </el-form-item>
     <el-divider/>
-    <el-form-item label="生产时间" prop="producteTime">
+    <el-form-item label="发布时间" prop="producteTime">
       <el-input v-model="ModelBaseInfoForm.producteTime"  placeholder="模型构建并发布的时间" />
+    </el-form-item>
+    <el-form-item label="模型假设" prop="hypothesis">
+      <el-input v-model="ModelBaseInfoForm.hypothesis"  placeholder="执行模型所需的假设" />
+    </el-form-item>
+    <el-form-item label="模型适用范围" prop="application">
+      <el-input v-model="ModelBaseInfoForm.application"  placeholder="介绍性内容" />
     </el-form-item>
       <el-form-item label="更新时间">
       <el-input v-model="ModelBaseInfoForm.updateTime"  placeholder="模型后续更新的版本及其时间" />
@@ -99,11 +105,8 @@
       <el-input v-model="ModelBaseInfoForm.other" type="textarea" placeholder="补充内容" />
     </el-form-item>
   </el-form>
-    <h3>元数据信息</h3>
+    <h3>运行信息</h3>
   <el-form ref="ruleFormRef" :model="ModelMetaDataForm" status-icon label-width="120px" class="demo-ruleForm" :rules="rules">
-    <el-form-item label="模型假设" >
-      <el-input v-model="ModelMetaDataForm.hypothesis" placeholder="执行模型所需的假设"/>
-    </el-form-item>
     <el-form-item label="输入信息" prop="modelInputs">
       <el-tag
         type="success"
@@ -115,18 +118,6 @@
         >{{ item.name }}</el-tag
       >
       <el-button type="success" :icon="Plus" @click="addInput" />
-    </el-form-item>
-    <el-form-item label="输出信息" prop="modelOutputs">
-      <el-tag
-        type="success"
-        v-for="(item, index) in ModelMetaDataForm.modelOutputs"
-        :key="index"
-        closable
-        @close="outputClose(index)"
-        @click="outputClick(index)"
-        >{{ item.name }}</el-tag
-      >
-      <el-button type="success" :icon="Plus" @click="addOutput" />
     </el-form-item>
     <el-form-item label="参数信息" prop="parameters">
       <el-tag
@@ -140,25 +131,26 @@
       >
       <el-button type="success" :icon="Plus" @click="addParam" />
     </el-form-item>
-    <ul>
-    <h4 class="mflex"><el-icon><CaretBottom /></el-icon>迭代次数:</h4>
-    <li style="margin-bottom: 10px">
-    <div style="display:flex;align-items:center">
-        <div class="text"><div class="necess">*</div>名称</div><el-input v-model="ModelMetaDataForm.iterate.name" />
-    </div>
-    </li>
-    <li style="margin-bottom: 10px">
-      <div style="display:flex;align-items:center">
-      <div  class="text"><div class="necess">*</div>默认值</div><el-input  v-model="ModelMetaDataForm.iterate.defaultValue" />
-      </div>
-    </li>
-      <li>
-        <div style="display:flex;align-items:center">
-          <div  class="text"><div class="necess">*</div>描述</div><el-input v-model="ModelMetaDataForm.iterate.description" />
-        </div>
-      </li>
-    </ul>
+    <el-form-item label="输出信息" prop="modelOutputs">
+      <el-tag
+        type="success"
+        v-for="(item, index) in ModelMetaDataForm.modelOutputs"
+        :key="index"
+        closable
+        @close="outputClose(index)"
+        @click="outputClick(index)"
+        >{{ item.name }}</el-tag
+      >
+      <el-button type="success" :icon="Plus" @click="addOutput" />
+    </el-form-item>
 
+    <h4 class="mflex" style="margin-left:20px"><el-icon><CaretBottom /></el-icon>模型运行边界条件:</h4>
+     <el-form-item label="上边界" >
+        <el-input v-model="ModelMetaDataForm.upperboundary"/>
+     </el-form-item>
+      <el-form-item label="下边界" >
+        <el-input v-model="ModelMetaDataForm.lowerboundary"/>
+     </el-form-item>
   </el-form>
     <h3>出处信息</h3>
   <el-form ref="ruleFormRef" :model="ModelSourceForm" status-icon label-width="120px" class="demo-ruleForm" :rules="rules">
@@ -188,7 +180,7 @@
     </el-form-item>
     <h5 style="margin-left: 50px;color:rgb(150,150,150);">建议格式:[1]岳天祥,刘纪远.生态地理建模中的多尺度问题[J].第四纪研究,2003(03):256-261.</h5>
     <el-form-item label="出版机构" prop="publication">
-      <el-input v-model="ModelSourceForm.publication" placeholder="说明发布该模型的机构"/>
+      <el-input v-model="ModelSourceForm.publication" placeholder="开发者所在单位"/>
     </el-form-item>
     <el-form-item label="发展机构" >
       <el-input v-model="ModelSourceForm.develop" placeholder="说明更新该模型的机构"/>
@@ -213,7 +205,7 @@
         <el-form-item label="输入描述" prop="description">
           <el-input v-model="inputForm.description" />
         </el-form-item>
-        <el-form-item v-if="Flag!='addoutput' && Flag!='updateoutput'" label="输入默认值" >
+        <el-form-item v-if="Flag!='addoutput' && Flag!='updateoutput' && Flag!='addinput' && Flag!='updateinput'" label="输入默认值" >
           <el-input v-model="inputForm.defaultValue" />
         </el-form-item>
         <el-form-item label="输入格式" prop="format">
@@ -368,19 +360,17 @@ export default defineComponent({
           name:'',
         },
         producteTime:'',
+        hypothesis:'',
+        application:'',
         updateTime:'',
         other: ''
       },
       modelMetaData: {
-        hypothesis:'',
         modelInputs: [] as any[],
         modelOutputs: [] as any[],
         parameters:[] as any[],
-        iterate:{
-          name:'',
-          description:'',
-          defaultValue:''
-        }
+        upperboundary:'',
+        lowerboundary:''
       },
       modelSource: {
         references:[] as any[],
@@ -414,21 +404,19 @@ export default defineComponent({
           name:'',
         },
         producteTime:'',
+        hypothesis:'',
+        application:'',
         updateTime:'',
         other: '',
         isUpload:'',
         isCodeUpload:'',
     });
     const ModelMetaDataForm = reactive({
-        hypothesis:'',
         modelInputs: [] as any[],
         modelOutputs: [] as any[],
         parameters:[] as any[],
-        iterate:{
-          name:'',
-          description:'',
-          defaultValue:''
-        }
+        upperboundary:'',
+        lowerboundary:''
     });
     const ModelSourceForm = reactive({
         references:[] as any[],
@@ -832,9 +820,6 @@ export default defineComponent({
       serverStorage:[
         { required: true, message: '请输入服务存储位置', trigger: 'change' }
       ],
-      hypothesis: [
-        { required: true, message: '请输入模型假设', trigger: 'change' }
-      ],
       algorithm: [
         { required: true, message: '请输入算法/等式', trigger: 'change' }
       ],
@@ -857,10 +842,22 @@ export default defineComponent({
         { required: true, message: '请输入编程语言', trigger: 'change' }
       ],
       producteTime: [
-        { required: true, message: '请输入生产时间', trigger: 'change' }
+        { required: true, message: '请输入发布时间', trigger: 'change' }
+      ],
+      hypothesis: [
+        { required: true, message: '请输入模型假设', trigger: 'change' }
+      ],
+      application: [
+        { required: true, message: '请输入模型适用范围', trigger: 'change' }
       ],
       parameters: [
         { required: true, message: '请添加参数信息', trigger: 'change' }
+      ],
+      upperboundary: [
+        { required: true,message: '请添加模型运行上边界条件', trigger: 'change' }
+      ],
+      lowerboundary: [
+        { required: true,message: '请添加模型运行下边界条件', trigger: 'change' }
       ],
       references: [
         { required: true,message: '请添加参考文献', trigger: 'none' }
@@ -963,7 +960,15 @@ export default defineComponent({
         return
       }
       if(!ModelBaseInfoForm.producteTime){
-        notice("warning", "失败", "“生产时间”不能为空")
+        notice("warning", "失败", "“发布时间”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.hypothesis){
+        notice("warning", "失败", "“模型假设”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.application){
+        notice("warning", "失败", "“模型适用范围”不能为空")
         return
       }
       if(!(ModelMetaDataForm.modelInputs.length>0)){
@@ -976,14 +981,6 @@ export default defineComponent({
       }
       if(!(ModelMetaDataForm.parameters.length>0)){
         notice("warning", "失败", "“参数信息”不能为空")
-        return
-      }
-      if(!ModelMetaDataForm.iterate.name){
-        notice("warning", "失败", "“迭代次数名称”不能为空")
-        return
-      }
-      if(!ModelMetaDataForm.iterate.description){
-        notice("warning", "失败", "“迭代次数描述”不能为空")
         return
       }
       if(!(ModelSourceForm.references.length>0)){
@@ -1011,14 +1008,16 @@ export default defineComponent({
       modelResource.modelBaseInfo.refSystemTime = ModelBaseInfoForm.refSystemTime
       modelResource.modelBaseInfo.refSystemSpace = ModelBaseInfoForm.refSystemSpace
       modelResource.modelBaseInfo.producteTime = ModelBaseInfoForm.producteTime
+      modelResource.modelBaseInfo.hypothesis = ModelBaseInfoForm.hypothesis
+      modelResource.modelBaseInfo.application = ModelBaseInfoForm.application
       modelResource.modelBaseInfo.updateTime = ModelBaseInfoForm.updateTime
       modelResource.modelBaseInfo.other = ModelBaseInfoForm.other
       modelResource.modelBaseInfo.isUpload = ModelBaseInfoForm.isUpload
       modelResource.modelBaseInfo.isCodeUpload = ModelBaseInfoForm.isCodeUpload
 
-      modelResource.modelMetaData.hypothesis = ModelMetaDataForm.hypothesis
+      modelResource.modelMetaData.upperboundary = ModelMetaDataForm.upperboundary
       modelResource.modelMetaData.parameters = ModelMetaDataForm.parameters
-      modelResource.modelMetaData.iterate = ModelMetaDataForm.iterate
+      modelResource.modelMetaData.lowerboundary = ModelMetaDataForm.lowerboundary
       modelResource.modelMetaData.modelInputs = ModelMetaDataForm.modelInputs
       modelResource.modelMetaData.modelOutputs = ModelMetaDataForm.modelOutputs
       
@@ -1110,7 +1109,15 @@ export default defineComponent({
         return
       }
       if(!ModelBaseInfoForm.producteTime){
-        notice("warning", "失败", "“生产时间”不能为空")
+        notice("warning", "失败", "“发布时间”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.hypothesis){
+        notice("warning", "失败", "“模型假设”不能为空")
+        return
+      }
+      if(!ModelBaseInfoForm.application){
+        notice("warning", "失败", "“模型适用范围”不能为空")
         return
       }
       if(!(ModelMetaDataForm.modelInputs.length>0)){
@@ -1123,14 +1130,6 @@ export default defineComponent({
       }
       if(!(ModelMetaDataForm.parameters.length>0)){
         notice("warning", "失败", "“输出信息”不能为空")
-        return
-      }
-      if(!ModelMetaDataForm.iterate.name){
-        notice("warning", "失败", "“迭代次数名称”不能为空")
-        return
-      }
-      if(!ModelMetaDataForm.iterate.description){
-        notice("warning", "失败", "“迭代次数描述”不能为空")
         return
       }
       if(!(ModelSourceForm.references.length>0)){
@@ -1157,14 +1156,16 @@ export default defineComponent({
       modelResource.modelBaseInfo.refSystemTime = ModelBaseInfoForm.refSystemTime
       modelResource.modelBaseInfo.refSystemSpace = ModelBaseInfoForm.refSystemSpace
       modelResource.modelBaseInfo.producteTime = ModelBaseInfoForm.producteTime
+      modelResource.modelBaseInfo.hypothesis = ModelBaseInfoForm.hypothesis
+      modelResource.modelBaseInfo.application = ModelBaseInfoForm.application
       modelResource.modelBaseInfo.updateTime = ModelBaseInfoForm.updateTime
       modelResource.modelBaseInfo.other = ModelBaseInfoForm.other
       modelResource.modelBaseInfo.isUpload = ModelBaseInfoForm.isUpload
       modelResource.modelBaseInfo.isCodeUpload = ModelBaseInfoForm.isCodeUpload
 
-      modelResource.modelMetaData.hypothesis = ModelMetaDataForm.hypothesis
+      modelResource.modelMetaData.upperboundary = ModelMetaDataForm.upperboundary
       modelResource.modelMetaData.parameters = ModelMetaDataForm.parameters
-      modelResource.modelMetaData.iterate = ModelMetaDataForm.iterate
+      modelResource.modelMetaData.lowerboundary = ModelMetaDataForm.lowerboundary
       modelResource.modelMetaData.modelInputs = ModelMetaDataForm.modelInputs
       modelResource.modelMetaData.modelOutputs = ModelMetaDataForm.modelOutputs
       
@@ -1202,13 +1203,15 @@ export default defineComponent({
         ModelBaseInfoForm.refSystemTime = (props.modelItem as any).modelBaseInfo.refSystemTime,
         ModelBaseInfoForm.refSystemSpace = (props.modelItem as any).modelBaseInfo.refSystemSpace,
         ModelBaseInfoForm.producteTime = (props.modelItem as any).modelBaseInfo.producteTime,
+        ModelBaseInfoForm.hypothesis = (props.modelItem as any).modelBaseInfo.hypothesis,
+        ModelBaseInfoForm.application = (props.modelItem as any).modelBaseInfo.application,
         ModelBaseInfoForm.updateTime = (props.modelItem as any).modelBaseInfo.updateTime,
         ModelBaseInfoForm.other = (props.modelItem as any).modelBaseInfo.other,
         ModelBaseInfoForm.isUpload = (props.modelItem as any).modelBaseInfo.isUpload,
         ModelBaseInfoForm.isCodeUpload = (props.modelItem as any).modelBaseInfo.isCodeUpload,
 
-        ModelMetaDataForm.hypothesis = (props.modelItem as any).modelMetaData.hypothesis,
-        ModelMetaDataForm.iterate = (props.modelItem as any).modelMetaData.iterate,
+        ModelMetaDataForm.upperboundary = (props.modelItem as any).modelMetaData.upperboundary,
+        ModelMetaDataForm.lowerboundary = (props.modelItem as any).modelMetaData.lowerboundary,
         ModelMetaDataForm.modelInputs = (props.modelItem as any).modelMetaData.modelInputs,
         ModelMetaDataForm.modelOutputs = (props.modelItem as any).modelMetaData.modelOutputs,
         ModelMetaDataForm.parameters = (props.modelItem as any).modelMetaData.parameters,

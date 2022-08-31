@@ -31,14 +31,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, reactive } from "vue";
+import { computed, defineComponent, onMounted, ref, reactive } from "vue";
 import router from "@/router";
 import type { UploadProps, UploadUserFile, UploadInstance, UploadFile } from "element-plus";
 import { createFileChunk, handlePostVideoFiles, checkVideoMergeStatus } from "@/utils/file";
 import {
   mergeProcessVideoFiles,
   clearVideoTemp,
-  removeProcessVideoFile
+  removeProcessVideoFile,
+  removeTempVideoFile
 } from "@/api/request";
 import { notice } from "@/utils/notice";
 import test from "node:test";
@@ -49,6 +50,9 @@ export default defineComponent({
     },
     process:{
       type:Object
+    },
+    type:{
+      type:String
     }
   },
   emits: ['returnVideo'],
@@ -62,6 +66,9 @@ export default defineComponent({
     const uuid = require('uuid')
     const videoId = uuid.v4()
     const uploadRef =ref([] as any[])
+    const type = computed(() => {
+      return props.type;
+    });
     const uploadForm = reactive({
       name:'',
       id:''
@@ -76,13 +83,25 @@ export default defineComponent({
     }
 
     const deleteUpload = async () => {
-      const data = await removeProcessVideoFile((router.currentRoute.value.params.apply as any).id,(props.process as any));
-      if (data != null && (data as any).code === 0) {
-        notice("success", "成功", "删除成功！");
-        dialogVisible.value = false
-        uploadForm.name = '';
-        uploadForm.id = '';
-        context.emit("returnVideo", uploadForm)
+      if(type.value!="add"){
+        const data = await removeProcessVideoFile((router.currentRoute.value.params.apply as any).id,(props.process as any));
+        if (data != null && (data as any).code === 0) {
+          notice("success", "成功", "删除成功！");
+          dialogVisible.value = false
+          uploadForm.name = '';
+          uploadForm.id = '';
+          context.emit("returnVideo", uploadForm)
+        }
+      }
+      else{
+        const data = await removeTempVideoFile((router.currentRoute.value.params.apply as any).id, {uuid:uploadForm.id});
+        if (data != null && (data as any).code === 0) {
+          notice("success", "成功", "删除成功！");
+          dialogVisible.value = false
+          uploadForm.name = '';
+          uploadForm.id = '';
+          context.emit("returnVideo", uploadForm)
+        }
       }
     }
 
@@ -118,15 +137,11 @@ export default defineComponent({
       const key = await mergeProcessVideoFiles(
         (router.currentRoute.value.params.apply as any).id,
         {
-        process:(props.process as any),
         uuid: videoId,
         name: uploadFile.value.name,
         total: files.length,
       });
-      if(key != null && (key as any).code === -10){
-         notice("warning", "成功", "请先将步骤信息保存后在添加视频!");
-      }
-      else if (key != null && (key as any).code === 0) {
+       if (key != null && (key as any).code === 0) {
         function check(res: number) {
           if (res === 1) {
             notice("success", "成功", "上传成功!");
@@ -141,6 +156,7 @@ export default defineComponent({
         await checkVideoMergeStatus(key.data, check);
       }
     };
+
     onMounted(() => {
       if((props.videoItem as any)){
         uploadForm.name = (props.videoItem as any).name

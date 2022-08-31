@@ -21,7 +21,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .el-container {
-  .el-header,
+  
+  .el-header{
+      
+  }
   .el-footer,
   .el-main {
     padding: 0;
