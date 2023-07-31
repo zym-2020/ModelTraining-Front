@@ -1,12 +1,12 @@
 <template>
   <div class="foot-main">
     <div class="image">
-      <img src="/modelTrainingCourse/submission/log/中国地理学会.png" alt="" height="82" />
-      <img src="/modelTrainingCourse/submission/log/logo (自然资源学会).png" alt="" height="82" />
-      <img src="/modelTrainingCourse/submission/log/logo (地理信息产业学会).png" alt="" height="82" />
-      <img src="/modelTrainingCourse/submission/log/ISDE.jpg" alt="" height="82" />
-      <img src="/modelTrainingCourse/submission/log/logo(教育部).png" alt="" height="82" />
-      <img src="/modelTrainingCourse/submission/log/DKY.png" alt="" height="82" />
+      <img src="/log/中国地理学会.png" alt="" height="82" />
+      <img src="/log/logo (自然资源学会).png" alt="" height="82" />
+      <img src="/log/logo (地理信息产业学会).png" alt="" height="82" />
+      <img src="/log/ISDE.jpg" alt="" height="82" />
+      <img src="/log/logo(教育部).png" alt="" height="82" />
+      <img src="/log/DKY.png" alt="" height="82" />
     </div>
     <div style="margin-bottom: 5px">Copyright © 2011-2022 OpenGMS. All Rights Reserved.</div>
     <el-link type="primary" href="https://geomodeling.njnu.edu.cn/"

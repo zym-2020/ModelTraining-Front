@@ -20,38 +20,33 @@ interface DataType {
 }
 import { defineComponent, ref } from "vue";
 import router from "@/router";
-import { notice } from "@/utils/notice";
 export default defineComponent({
   setup() {
     const data = ref<DataType[]>([
       {
         title: "模型作业",
         des: "这是模型作业模块",
-        path: "/modelTrainingCourse/submission/homework",
+        path: "/homework",
       },
       {
         title: "模型应用竞赛",
         des: "这是模型应用竞赛模块",
-        path: "/apply",
+        path: "/homework",
       },
       {
         title: "模型开发竞赛",
         des: "这是模型开发竞赛模块",
-        path: "/develp",
+        path: "/homework",
       },
       {
         title: "证书发放",
         des: "这是证书发放模块",
-        path: "/modelTrainingCourse/submission/certificate",
+        path: "/certificate",
       },
     ]);
 
     const toNav = (type: string) => {
-      if (type === "/modelTrainingCourse/submission/homework" || type === "/modelTrainingCourse/submission/certificate") {
-        router.push({ path: type });
-      } else {
-        notice("warning", "警告", "该页面暂未开放！");
-      }
+      router.push({ path: type });
     };
 
     return {

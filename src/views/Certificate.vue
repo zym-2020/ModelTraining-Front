@@ -51,7 +51,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, computed, onMounted } from "vue";
-import { getAddress } from "@/api/request";
+
 export default defineComponent({
   setup() {
     const train = ref("");
@@ -63,34 +63,27 @@ export default defineComponent({
     });
 
     const btnDisabled = computed(() => {
-      // if (certificate.ctype === "train" && train.value != "") {
-      //   return false;
-      // } else if (certificate.ctype === "apply" && apply.value != "") {
-      //   return false;
-      // } else if (certificate.ctype === "develop" && develop.value != "") {
-      //   return false;
-      // } else {
-      //   return true;
-      // }
-      return true;
+      if (certificate.ctype === "train" && train.value != "") {
+        return false;
+      } else if (certificate.ctype === "apply" && apply.value != "") {
+        return false;
+      } else if (certificate.ctype === "develop" && develop.value != "") {
+        return false;
+      } else {
+        return true;
+      }
     });
     const onDownLoad = () => {
       if (certificate.ctype === "train") {
-        window.location.href = `http://172.21.213.125:8888/certificate/getCertificate/${train.value}`;
+        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/certificate/getCertificate/${train.value}`;
       } else if (certificate.ctype === "apply") {
-        window.location.href = `http://172.21.213.125:8888/certificate/getCertificate/${apply.value}`;
+        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/certificate/getCertificate/${apply.value}`;
       } else if (certificate.ctype === "develop") {
-        window.location.href = `http://172.21.213.125:8888/certificate/getCertificate/${develop.value}`;
+        window.location.href = `https://geomodeling.njnu.edu.cn/modelTrainingCourse/submission/model/certificate/getCertificate/${develop.value}`;
       }
     };
 
     onMounted(async () => {
-      const data = await getAddress();
-      if (data != null && (data as any).code === 0) {
-        train.value = data.data.train;
-        apply.value = data.data.apply;
-        develop.value = data.data.develop;
-      }
       skeletonFlag.value = false;
     });
 
