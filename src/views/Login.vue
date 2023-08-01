@@ -7,7 +7,11 @@
         <el-input v-model="formLabelAlign.email" placeholder="请输入邮箱" />
       </el-form-item>
       <el-form-item label="密码">
-        <el-input v-model="formLabelAlign.password" placeholder="请输入密码" />
+        <el-input
+          v-model="formLabelAlign.password"
+          placeholder="请输入密码"
+          type="password"
+        />
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="loginClick">登录</el-button>

@@ -12,7 +12,7 @@ import axios, {
   const requestList = new Set();
   
   const axiosInstance: AxiosInstance = axios.create({
-    baseURL: "/modelTraining/",
+    baseURL: "/model/",
     timeout: 200000,
   });
   

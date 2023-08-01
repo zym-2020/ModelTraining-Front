@@ -4,11 +4,14 @@ import "nprogress/nprogress.css";
 import { usePermissionStore } from "@/store/permission-store";
 import { getToken } from "./utils/common";
 
+let permissionStore: any = null;
+
 NProgress.configure({ showSpinner: false });
 router.beforeEach(async (to, form, next) => {
   NProgress.start();
+  if (permissionStore === null) permissionStore = usePermissionStore()
   if (getToken()) {
-    const permissionStore = usePermissionStore();
+    
     if (permissionStore.email === "") {
       await permissionStore.setUserInfo();
       permissionStore.generateRouters(asyncRouters);
